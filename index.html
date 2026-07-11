@@ -192,8 +192,8 @@
                 </div>
             </div>
 
-            <div id="memoryLimitWarning" class="hidden text-center text-[10px] text-accentRed font-semibold uppercase tracking-wider animate-pulse py-2">
-                ⚠️ Limite de memória atingido para este chat. Comece um novo tópico.
+            <div id="memoryLimitWarning" class="hidden text-center text-[10px] text-accentBlue font-semibold uppercase tracking-wider animate-pulse py-2">
+                🔄 Otimização de Memória Ciclista ativa (Mantendo os últimos tópicos).
             </div>
         </div>
 
@@ -719,15 +719,17 @@
 
             const activeChat = conversations[currentChatId];
             if (activeChat && activeChat.messages) {
-                activeChat.messages.forEach(msg => {
-                    appendMessageUI(msg.sender, msg.text, msg.isUser);
-                });
-                
+                // Checa e processa regra cíclica de memória (Se bater 40, esquece as 30 primeiras e mantém as 10 últimas)
                 if (activeChat.messages.length >= 40) {
+                    activeChat.messages = activeChat.messages.slice(-10);
+                    saveConversations();
                     memoryLimitWarning.classList.remove('hidden');
-                } else {
-                    memoryLimitWarning.classList.add('hidden');
+                    setTimeout(() => memoryLimitWarning.classList.add('hidden'), 5000);
                 }
+
+                activeChat.messages.forEach((msg, idx) => {
+                    appendMessageUI(msg.sender, msg.text, msg.isUser, idx);
+                });
             }
             
             const modeSpan = chatHistory.querySelector('#welcomeMessage span:last-child');
@@ -841,28 +843,79 @@
             }, 2500);
         }
 
-        function appendMessageUI(sender, text, isUser) {
+        // Função utilitária para copiar texto
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Copiado para a área de transferência!");
+            }).catch(() => {
+                showToast("Erro ao copiar.");
+            });
+        }
+
+        // Função utilitária para editar mensagem do usuário (Estilo Gemini)
+        function editUserMessage(index) {
+            const activeChat = conversations[currentChatId];
+            if (!activeChat || !activeChat.messages[index]) return;
+
+            const originalText = activeChat.messages[index].text;
+            const newText = prompt("Edite sua mensagem:", originalText);
+
+            if (newText !== null && newText.trim() !== "") {
+                // Remove todas as mensagens posteriores para reconstruir o fluxo
+                activeChat.messages = activeChat.messages.slice(0, index);
+                saveConversations();
+                
+                // Joga o texto novo no input e dispara o envio automaticamente
+                unifiedInput.value = newText.trim();
+                sendBtn.click();
+            }
+        }
+
+        function appendMessageUI(sender, text, isUser, index = null) {
             const msgDiv = document.createElement('div');
             msgDiv.className = isUser 
-                ? "flex flex-col gap-1 max-w-[85%] self-end bg-accentBlue/10 border border-accentBlue/30 p-3 rounded-2xl rounded-tr-none text-right"
-                : "flex flex-col gap-1 max-w-[85%] self-start bg-slate-950 border border-slate-900 p-3 rounded-2xl rounded-tl-none";
+                ? "flex flex-col gap-1 max-w-[85%] self-end bg-accentBlue/10 border border-accentBlue/30 p-3 rounded-2xl rounded-tr-none text-right relative group"
+                : "flex flex-col gap-1 max-w-[85%] self-start bg-slate-950 border border-slate-900 p-3 rounded-2xl rounded-tl-none relative group";
 
             const senderSpan = document.createElement('span');
             senderSpan.className = isUser ? "text-[9px] text-slate-400 font-bold uppercase tracking-wider" : "text-[9px] text-accentBlue font-bold uppercase tracking-wider";
             senderSpan.innerText = sender;
 
             const textP = document.createElement('p');
-            textP.className = "text-xs text-slate-200 leading-relaxed whitespace-pre-line text-left";
+            textP.className = "text-xs text-slate-200 leading-relaxed whitespace-pre-line text-left break-words pb-4";
             textP.innerText = text;
+
+            // Container de ações (Copiar e Editar)
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = "absolute bottom-1 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-950/80 px-1.5 py-0.5 rounded-md border border-slate-800/60";
+
+            // Botão Copiar
+            const copyBtn = document.createElement('button');
+            copyBtn.className = "text-slate-400 hover:text-accentBlue transition-colors";
+            copyBtn.innerHTML = `<i data-lucide="copy" class="w-3 h-3"></i>`;
+            copyBtn.onclick = (e) => { e.stopPropagation(); copyToClipboard(text); };
+
+            actionsDiv.appendChild(copyBtn);
+
+            // Botão Editar (Apenas para mensagens do usuário e válidas no índice)
+            if (isUser && index !== null) {
+                const editBtn = document.createElement('button');
+                editBtn.className = "text-slate-400 hover:text-amber-500 transition-colors";
+                editBtn.innerHTML = `<i data-lucide="pencil" class="w-3 h-3"></i>`;
+                editBtn.onclick = (e) => { e.stopPropagation(); editUserMessage(index); };
+                actionsDiv.appendChild(editBtn);
+            }
 
             msgDiv.appendChild(senderSpan);
             msgDiv.appendChild(textP);
+            msgDiv.appendChild(actionsDiv);
+            
             chatHistory.appendChild(msgDiv);
+            lucide.createIcons({ attrs: { class: 'w-3 h-3' } });
             chatScrollContainer.scrollTop = chatScrollContainer.scrollHeight;
         }
 
         function appendMessage(sender, text, isUser) {
-            appendMessageUI(sender, text, isUser);
             if(conversations[currentChatId]) {
                 conversations[currentChatId].messages.push({ sender, text, isUser });
                 
@@ -872,6 +925,8 @@
                 }
                 saveConversations();
             }
+            // Recarrega para aplicar os índices corretos e regras de corte cíclico se necessário
+            loadChatMessagesIntoUI();
         }
 
         // Evento de Envio Principal
