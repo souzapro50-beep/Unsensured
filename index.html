@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark selection:bg-goldMain/30">
+<html lang="pt-BR" id="htmlRoot" class="dark selection:bg-emerald-500/30">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sabedoria Oculta - Arcane Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -17,14 +18,19 @@
                         goldMain: '#d4af37',
                         goldHover: '#aa882c',
                         goldLight: '#f3e5ab',
-                        accentRed: '#ff4444'
+                        accentRed: '#ff4444',
+                        emeraldBg: '#040d0a',
+                        emeraldCard: '#081712',
+                        emeraldBorder: '#10382b',
+                        emeraldAccent: '#10b981',
+                        emeraldHover: '#059669',
+                        emeraldLight: '#34d399'
                     },
                     animation: {
                         'fade-in-up': 'fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                         'pop-in': 'popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'gemini-pulse': 'geminiPulse 1.8s infinite ease-in-out',
-                        'border-glow': 'borderGlow 4s linear infinite',
                     },
                     keyframes: {
                         fadeInUp: {
@@ -34,15 +40,6 @@
                         popIn: {
                             '0%': { opacity: '0', transform: 'scale(0.92)' },
                             '100%': { opacity: '1', transform: 'scale(1)' }
-                        },
-                        geminiPulse: {
-                            '0%, 100%': { transform: 'scale(0.85)', opacity: '0.4' },
-                            '50%': { transform: 'scale(1.25)', opacity: '1' }
-                        },
-                        borderGlow: {
-                            '0%': { 'background-position': '0% 50%' },
-                            '50%': { 'background-position': '100% 50%' },
-                            '100%': { 'background-position': '0% 50%' }
                         }
                     }
                 }
@@ -76,7 +73,6 @@
             touch-action: manipulation;
         }
         
-        /* GEMINI LIKE THINKING WAVE */
         .gemini-loader {
             display: flex;
             align-items: center;
@@ -105,25 +101,12 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        .gold-glow-sm {
-            box-shadow: 0 0 12px -2px rgba(212, 175, 55, 0.25);
-        }
-        
-        /* GLOWING BORDER CONTAINER */
-        .animated-border {
-            background: linear-gradient(90deg, rgba(212, 175, 55, 0.2), rgba(255, 255, 255, 0.05), rgba(212, 175, 55, 0.2));
-            background-size: 200% 200%;
-            animation: borderGlow 6s ease infinite;
-        }
-        
-        /* SMOOTH MODAL TRANSITIONS */
+        .gold-glow-sm { box-shadow: 0 0 12px -2px rgba(212, 175, 55, 0.25); }
+
         .modal-blur-enter {
             animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* ----------------------------------------------------------- */
-        /* AJUSTES DE ANIMAÇÃO NOS BOTÕES E INPUTS (EVITA ACHATAMENTO) */
-        /* ----------------------------------------------------------- */
         .btn-pin {
             outline: none !important;
             transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
@@ -133,26 +116,154 @@
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3) !important;
         }
 
-        /* CONTAINER DO INPUT COM ANIMAÇÃO AO CLICAR/FOCO */
         #inputBoxContainer {
-            transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
         }
         #inputBoxContainer:focus-within {
             border-color: rgba(212, 175, 55, 0.6) !important;
             box-shadow: 0 0 20px -3px rgba(212, 175, 55, 0.3) !important;
             transform: translateY(-2px);
         }
+
+        .ai-formatted-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+        .ai-formatted-text p { margin-bottom: 0.85rem; }
+        .ai-formatted-text p:last-child { margin-bottom: 0; }
+        .ai-formatted-text strong { color: #ffffff; font-weight: 700; }
+        .ai-formatted-text ul, .ai-formatted-text ol { padding-left: 1.25rem; margin-bottom: 0.85rem; }
+        .ai-formatted-text ul { list-style-type: disc; }
+        .ai-formatted-text ol { list-style-type: decimal; }
+        .ai-formatted-text li { margin-bottom: 0.4rem; }
+
+        /* ESTILO DO OLHO PRETO E DOURADO */
+        .eye-icon-box-gold {
+            background: linear-gradient(135deg, #0d0b05, #1d180a) !important;
+            border: 1px solid rgba(212, 175, 55, 0.4) !important;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+        }
+        .eye-icon-gold {
+            color: #d4af37 !important;
+            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.6));
+        }
+
+        /* REGRAS TOTAIS DO TEMA ESMERALDA / KRYPTONITA */
+        body.theme-emerald {
+            background-color: #020907 !important;
+            color: #d1fae5 !important;
+            font-family: monospace, monospace !important;
+        }
+        body.theme-emerald #loginScreen {
+            background-color: rgba(2, 9, 7, 0.98) !important;
+        }
+        body.theme-emerald .btn-pin {
+            background-color: rgba(8, 23, 18, 0.8) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            color: #d1fae5 !important;
+        }
+        body.theme-emerald .btn-pin:hover {
+            border-color: rgba(16, 185, 129, 0.8) !important;
+            background-color: rgba(16, 185, 129, 0.15) !important;
+        }
+        body.theme-emerald ::-webkit-scrollbar-thumb {
+            background: #10382b !important;
+        }
+        body.theme-emerald ::-webkit-scrollbar-thumb:hover {
+            background: #10b981 !important;
+        }
+        body.theme-emerald header {
+            background-color: rgba(4, 13, 10, 0.95) !important;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+        body.theme-emerald #sidebarMenu {
+            background-color: rgba(2, 9, 7, 0.98) !important;
+            border-right: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+        body.theme-emerald .bg-darkSlate {
+            background-color: #081712 !important;
+        }
+        body.theme-emerald .border-stone-800, body.theme-emerald .border-stone-800\/80, body.theme-emerald .border-stone-800\/60 {
+            border-color: rgba(16, 185, 129, 0.25) !important;
+        }
+        body.theme-emerald .text-goldMain, body.theme-emerald .text-goldLight {
+            color: #10b981 !important;
+        }
+        body.theme-emerald .bg-goldMain {
+            background-color: #10b981 !important;
+            color: #020907 !important;
+        }
+        body.theme-emerald .border-goldMain, body.theme-emerald .border-goldMain\/30, body.theme-emerald .border-goldMain\/40 {
+            border-color: #10b981 !important;
+        }
+        body.theme-emerald #includePhilosophyToggle:checked + div {
+            background-color: #10b981 !important;
+        }
+        body.theme-emerald #mainAppContainer {
+            border-left: 1px dashed rgba(16, 185, 129, 0.2);
+            border-right: 1px dashed rgba(16, 185, 129, 0.2);
+        }
+        body.theme-emerald #inputBoxContainer {
+            background-color: rgba(8, 23, 18, 0.95) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald #inputBoxContainer:focus-within {
+            border-color: rgba(16, 185, 129, 0.9) !important;
+            box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald .gemini-loader div {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+        }
+        body.theme-emerald #tacticalExtraPanel {
+            display: flex !important;
+        }
+        body.theme-emerald #toast {
+            border-color: rgba(16, 185, 129, 0.4) !important;
+            color: #10b981 !important;
+        }
+        body.theme-emerald .msg-user-box {
+            background-color: rgba(16, 185, 129, 0.12) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald .msg-ai-box {
+            background-color: rgba(8, 23, 18, 0.95) !important;
+            border-color: rgba(16, 185, 129, 0.25) !important;
+        }
+        body.theme-emerald #sendBtn {
+            background: linear-gradient(135deg, #059669, #10b981) !important;
+            color: #020907 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald #saveConfigBtn {
+            background: linear-gradient(135deg, #059669, #10b981) !important;
+            color: #020907 !important;
+        }
+        body.theme-emerald #newChatBtn {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(8, 23, 18, 0.8)) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+            color: #10b981 !important;
+        }
+        body.theme-emerald .trigger-card {
+            background-color: rgba(8, 23, 18, 0.6) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+        body.theme-emerald .trigger-card:hover {
+            border-color: rgba(16, 185, 129, 0.8) !important;
+            background-color: rgba(8, 23, 18, 0.9) !important;
+        }
     </style>
 </head>
-<body class="bg-deepBlack text-stone-100 font-sans flex flex-col justify-between select-none">
+<body id="bodyContainer" class="bg-deepBlack text-stone-100 font-sans flex flex-col justify-between select-none">
 
     <!-- LOGIN / PIN SCREEN -->
     <div id="loginScreen" class="fixed inset-0 bg-deepBlack/95 backdrop-blur-2xl z-50 flex flex-col items-center justify-center p-6 transition-all duration-500">
         <div class="w-full max-w-sm flex flex-col items-center gap-8 animate-pop-in">
             <div class="relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-goldMain to-goldHover rounded-full blur-md opacity-40 group-hover:opacity-80 transition duration-500 animate-pulse-slow"></div>
-                <div class="relative bg-darkSlate p-5 rounded-full shadow-2xl border border-goldMain/30">
-                    <i data-lucide="eye" class="w-10 h-10 text-goldMain animate-pulse-slow"></i>
+                <div class="absolute -inset-1 bg-gradient-to-r from-goldMain to-goldHover rounded-full blur-md opacity-40 group-hover:opacity-80 transition duration-500 animate-pulse-slow" id="pinGlow"></div>
+                <div class="relative eye-icon-box-gold p-5 rounded-full shadow-2xl" id="pinIconBox">
+                    <i data-lucide="eye" class="w-10 h-10 eye-icon-gold animate-pulse-slow" id="pinIcon"></i>
                 </div>
             </div>
             
@@ -203,7 +314,7 @@
     <div id="sidebarMenu" class="fixed inset-y-0 left-0 w-[310px] bg-deepBlack/95 backdrop-blur-2xl border-r border-stone-800/60 z-50 transform -translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between shadow-2xl h-full overflow-hidden">
         <div class="flex flex-col flex-1 p-5 gap-4 overflow-hidden">
             <div class="flex items-center justify-between border-b border-stone-800/60 pb-4 shrink-0">
-                <span class="text-[11px] font-black tracking-widest uppercase text-stone-400 flex items-center gap-2">
+                <span class="text-[11px] font-black tracking-widest uppercase text-stone-400 flex items-center gap-2" id="sidebarTitle">
                     <i data-lucide="folder-kanban" class="w-4 h-4 text-goldMain"></i>
                     Registros de Consulta
                 </span>
@@ -214,26 +325,33 @@
             
             <button id="newChatBtn" class="w-full bg-gradient-to-r from-goldMain/10 via-darkSlate to-goldMain/5 border border-goldMain/30 hover:border-goldMain text-goldMain text-xs font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-95 shrink-0 gold-glow-sm">
                 <i data-lucide="sparkles" class="w-4 h-4 text-goldMain"></i>
-                Iniciar Nova Linha
+                <span id="newChatText">Iniciar Nova Linha</span>
             </button>
 
-            <!-- FILTRO DE BUSCA -->
             <div class="relative shrink-0 mt-1">
                 <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-stone-600"></i>
                 <input id="searchChatInput" type="text" placeholder="Filtrar registros..." class="w-full text-xs bg-darkSlate/60 border border-stone-800/80 rounded-xl pl-8 pr-3 py-2 text-stone-300 placeholder-stone-600 focus:outline-none focus:border-goldMain/40 transition-all font-mono">
             </div>
 
-            <div class="flex flex-col gap-1.5 flex-1 overflow-y-auto mt-1 scrollable-area pr-1" id="chatListContainer"></div>
+            <div class="flex flex-col gap-2 flex-1 overflow-y-auto mt-1 scrollable-area pr-1" id="chatListContainer"></div>
+
+            <div class="border-t border-stone-800/60 pt-3 mt-auto shrink-0">
+                <button id="openConfigModalBtn" class="w-full bg-darkSlate border border-stone-800 hover:bg-stone-900 text-stone-300 text-[11px] font-bold tracking-widest uppercase py-3 rounded-xl transition-all flex items-center justify-center gap-2 hover:border-goldMain/40">
+                    <i data-lucide="settings" class="w-4 h-4 text-goldMain"></i>
+                    <span id="configBtnText">Painel Geral / Config</span>
+                </button>
+            </div>
         </div>
+
         <div class="p-4 border-t border-stone-800/60 bg-darkSlate/40 flex items-center justify-between shrink-0 backdrop-blur-md">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-goldMain/15 flex items-center justify-center text-xs font-black text-goldMain border border-goldMain/30 shadow-inner">Ω</div>
+                <div class="w-8 h-8 rounded-full bg-goldMain/15 flex items-center justify-center text-xs font-black text-goldMain border border-goldMain/30 shadow-inner" id="userBadgeIcon">Ω</div>
                 <div class="flex flex-col">
-                    <span class="text-xs font-bold tracking-wider text-stone-300 uppercase">Operador Supremo</span>
+                    <span class="text-xs font-bold tracking-wider text-stone-300 uppercase" id="userNameLabel">Operador Supremo</span>
                     <span class="text-[9px] text-stone-500 font-mono">Sessão Criptografada</span>
                 </div>
             </div>
-            <div class="w-2 h-2 rounded-full bg-goldMain animate-ping shadow-[0_0_8px_#d4af37]"></div>
+            <div class="w-2 h-2 rounded-full bg-goldMain animate-ping shadow-[0_0_8px_#d4af37]" id="userStatusPing"></div>
         </div>
     </div>
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-45 hidden transition-opacity duration-300"></div>
@@ -245,12 +363,12 @@
                 <i data-lucide="layers" class="w-5 h-5"></i>
             </button>
             <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-tr from-goldHover to-goldMain p-2 rounded-xl shadow-lg shadow-goldMain/10">
-                    <i data-lucide="cpu" class="w-5 h-5 text-deepBlack"></i>
+                <div class="eye-icon-box-gold p-2 rounded-xl shadow-lg" id="headerLogoBox">
+                    <i data-lucide="eye" class="w-5 h-5 eye-icon-gold" id="headerLogoIcon"></i>
                 </div>
                 <div>
-                    <h1 class="text-xs font-black tracking-widest uppercase text-stone-100 flex items-center gap-2">
-                        Sabedoria Oculta <span class="text-[8px] text-deepBlack bg-gradient-to-r from-goldLight to-goldMain px-2 py-0.5 rounded font-mono font-bold tracking-normal uppercase shadow-sm">Arcane Engine</span>
+                    <h1 class="text-xs font-black tracking-widest uppercase text-stone-100 flex items-center gap-2" id="headerTitleText">
+                        Sabedoria Oculta <span class="text-[8px] text-deepBlack bg-gradient-to-r from-goldLight to-goldMain px-2 py-0.5 rounded font-mono font-bold tracking-normal uppercase shadow-sm" id="headerBadge">Arcane Engine</span>
                     </h1>
                     <div class="flex items-center gap-1.5 mt-0.5">
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]" id="latencyDot"></span>
@@ -270,13 +388,13 @@
             </button>
 
             <div class="relative">
-                <button id="configBtn" class="p-2 text-stone-400 hover:text-goldMain hover:bg-darkSlate/60 rounded-xl transition-all active:scale-90 border border-transparent hover:border-stone-800">
-                    <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+                <button id="statsBtn" class="p-2 text-stone-400 hover:text-goldMain hover:bg-darkSlate/60 rounded-xl transition-all active:scale-90 border border-transparent hover:border-stone-800" title="Métricas">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
                 </button>
                 
                 <div id="statsDropdownMenu" class="absolute right-0 mt-2 w-64 bg-deepBlack/95 backdrop-blur-2xl border border-stone-800 rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col gap-3 modal-blur-enter">
                     <div class="border-b border-stone-800/80 pb-2 flex items-center justify-between">
-                        <span class="text-[10px] font-black tracking-widest uppercase text-goldMain flex items-center gap-1.5">
+                        <span class="text-[10px] font-black tracking-widest uppercase text-goldMain flex items-center gap-1.5" id="statsTitle">
                             <i data-lucide="activity" class="w-3.5 h-3.5"></i>
                             Métricas do Sistema
                         </span>
@@ -296,19 +414,29 @@
                             <span id="appStorageSize" class="text-stone-200 font-bold">0.00 KB</span>
                         </div>
                     </div>
-                    <button id="openConfigModalBtn" class="w-full bg-darkSlate border border-stone-800 hover:bg-stone-900 text-stone-300 text-[10px] font-bold tracking-widest uppercase py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5 mt-1 hover:border-goldMain/30">
-                        <i data-lucide="settings" class="w-3.5 h-3.5 text-goldMain"></i> Painel Geral
-                    </button>
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- EXTRA TACTICAL PANEL (MODO KRYPTONITA EXCLUSIVO) -->
+    <div id="tacticalExtraPanel" class="hidden bg-emeraldCard border-b border-emeraldBorder px-4 py-2 text-[10px] font-mono flex flex-wrap items-center justify-between text-emeraldLight gap-2">
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5 font-bold"><i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emeraldAccent animate-pulse"></i> PAINEL KRYPTONITA EXCLUSIVO</span>
+            <span class="hidden sm:flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3 text-emeraldAccent"></i> CRIPTOGRAFIA VERDE ATIVA</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="runKryptoniteThreatScan()" class="hover:bg-emeraldAccent hover:text-emeraldBg uppercase border border-emeraldBorder px-2.5 py-1 rounded bg-emeraldBg transition-all flex items-center gap-1 font-bold">
+                <i data-lucide="radar" class="w-3 h-3 text-emeraldAccent"></i> Varredura de Ameaças (Threat Scan)
+            </button>
+        </div>
+    </div>
+
     <!-- MAIN CHAT PANEL -->
-    <main class="flex-1 flex flex-col w-full max-w-2xl mx-auto p-4 overflow-hidden justify-between relative h-full">
+    <main id="mainAppContainer" class="flex-1 flex flex-col w-full max-w-2xl mx-auto p-4 overflow-hidden justify-between relative h-full">
         
-        <div class="flex-1 flex flex-col overflow-y-auto mb-36 scroll-smooth scrollable-area pr-1" id="chatScrollContainer">
-            <div id="chatHistory" class="flex flex-col gap-4 p-1">
+        <div class="flex-1 flex flex-col overflow-y-auto mb-36 scroll-smooth scrollable-area pr-1 gap-6" id="chatScrollContainer">
+            <div id="chatHistory" class="flex flex-col gap-6 p-1">
                 <div id="welcomeMessage" class="flex flex-col gap-2 max-w-[92%] self-start bg-darkSlate/90 border border-stone-800/80 p-4 rounded-2xl rounded-tl-none shadow-xl backdrop-blur-md animate-fade-in-up">
                     <div class="flex items-center justify-between border-b border-stone-800/60 pb-2">
                         <span id="welcomeSender" class="text-[10px] text-goldMain font-extrabold uppercase tracking-widest flex items-center gap-1.5">
@@ -326,39 +454,25 @@
                 </div>
             </div>
             
-            <div id="quickTriggersContainer" class="grid grid-cols-2 gap-2.5 mt-4 px-1 shrink-0 animate-fade-in-up">
-                <button onclick="injectTrigger('Mapeie todas as vulnerabilidades lógicas e falhas ocultas do seguinte cenário: ')" class="p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
+            <div id="quickTriggersContainer" class="grid grid-cols-2 gap-2.5 mt-2 px-1 shrink-0 animate-fade-in-up">
+                <button onclick="injectTrigger('Mapeie todas as vulnerabilidades lógicas e falhas ocultas do seguinte cenário: ')" class="trigger-card p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
                     <div class="flex items-center gap-2 text-goldMain mb-1">
                         <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>
                         <span class="text-[9px] font-extrabold tracking-widest uppercase">Vulnerabilidades</span>
                     </div>
                     <p class="text-[11px] text-stone-400 group-hover:text-stone-200 transition-colors line-clamp-1">Encontrar brechas lógicas críticas.</p>
                 </button>
-                <button onclick="injectTrigger('Simule a reação exata e as contramedidas prováveis para a seguinte ação: ')" class="p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
+                <button onclick="injectTrigger('Simule a reação exata e as contramedidas prováveis para a seguinte ação: ')" class="trigger-card p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
                     <div class="flex items-center gap-2 text-goldMain mb-1">
                         <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
                         <span class="text-[9px] font-extrabold tracking-widest uppercase">Simular Reação</span>
                     </div>
                     <p class="text-[11px] text-stone-400 group-hover:text-stone-200 transition-colors line-clamp-1">Prever a resposta do alvo.</p>
                 </button>
-                <button onclick="injectTrigger('Analise as verdadeiras intenções ocultas, subtextos e blefes na seguinte situação: ')" class="p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
-                    <div class="flex items-center gap-2 text-goldMain mb-1">
-                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                        <span class="text-[9px] font-extrabold tracking-widest uppercase">Ler Subtexto</span>
-                    </div>
-                    <p class="text-[11px] text-stone-400 group-hover:text-stone-200 transition-colors line-clamp-1">Desmascarar segundas intenções.</p>
-                </button>
-                <button onclick="injectTrigger('Desenvolva um plano de contenção estrito de danos em passos frios e diretos para o caso de: ')" class="p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
-                    <div class="flex items-center gap-2 text-goldMain mb-1">
-                        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-                        <span class="text-[9px] font-extrabold tracking-widest uppercase">Contenção Limpa</span>
-                    </div>
-                    <p class="text-[11px] text-stone-400 group-hover:text-stone-200 transition-colors line-clamp-1">Plano emergencial em passos frios.</p>
-                </button>
             </div>
 
-            <!-- GEMINI-LIKE THINKING ANIMATION -->
-            <div id="geminiThinking" class="hidden flex flex-col gap-1.5 max-w-[90%] self-start bg-darkSlate/90 border border-stone-800 p-3.5 rounded-2xl rounded-tl-none mt-4 shadow-xl backdrop-blur-md animate-fade-in-up">
+            <!-- GEMINI THINKING ANIMATION -->
+            <div id="geminiThinking" class="hidden flex flex-col gap-1.5 max-w-[90%] self-start bg-darkSlate/90 border border-stone-800 p-3.5 rounded-2xl rounded-tl-none mt-2 shadow-xl backdrop-blur-md animate-fade-in-up">
                 <span id="thinkingSender" class="text-[10px] text-goldMain font-extrabold uppercase tracking-widest flex items-center gap-1.5">
                     <i data-lucide="sparkles" class="w-3.5 h-3.5 animate-spin"></i> Oráculo
                 </span>
@@ -370,11 +484,11 @@
             </div>
 
             <div id="memoryLimitWarning" class="hidden text-center text-xs text-goldMain font-semibold uppercase tracking-wider animate-pulse py-3 bg-goldMain/5 border border-goldMain/20 rounded-xl my-2">
-                🔄 Reciclagem de Memória de Curto Prazo Ativada. (10 mensagens antigas descartadas)
+                🔄 Reciclagem de Memória de Curto Prazo Ativada.
             </div>
         </div>
 
-        <!-- INPUT CONTAINER WITH DYNAMIC GLOW AND ANIMATIONS -->
+        <!-- INPUT CONTAINER -->
         <div id="inputBoxContainer" class="absolute bottom-4 left-4 right-4 bg-darkSlate/90 backdrop-blur-2xl rounded-3xl px-4 py-3 flex flex-col gap-1 border border-stone-800/80 shadow-2xl z-10">
             <div id="imagePreviewContainer" class="hidden flex items-center gap-2 mb-2 p-2 rounded-2xl border border-stone-800/80 bg-deepBlack/60 overflow-x-auto max-w-full scrollable-area"></div>
             
@@ -408,7 +522,7 @@
         <div class="bg-darkSlate/95 border border-stone-800/80 rounded-3xl w-full max-w-md max-h-[85vh] p-5 flex flex-col gap-4 shadow-2xl overflow-y-auto scrollable-area modal-blur-enter">
             
             <div class="flex items-center justify-between border-b border-stone-800 pb-3">
-                <h3 class="font-black text-xs tracking-widest uppercase text-goldMain flex items-center gap-2">
+                <h3 class="font-black text-xs tracking-widest uppercase text-goldMain flex items-center gap-2" id="configModalTitle">
                     <i data-lucide="shield-alert" class="w-4 h-4 text-goldMain"></i>
                     Modificadores do Sistema
                 </h3>
@@ -422,12 +536,36 @@
                 </div>
             </div>
 
+            <div class="bg-deepBlack/50 border border-stone-800/80 p-4 rounded-2xl flex flex-col gap-2 relative">
+                <label class="text-xs font-bold text-stone-300 uppercase tracking-widest flex items-center gap-1">
+                    <i data-lucide="palette" class="w-3.5 h-3.5 text-goldMain"></i> Tema e Layout da Interface
+                </label>
+                
+                <div id="customThemeSelector" class="w-full bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-xs text-stone-200 flex items-center justify-between cursor-pointer hover:border-goldMain/50 transition-all">
+                    <span id="selectedThemeLabel" class="font-bold flex items-center gap-2">
+                        <i data-lucide="sun" class="w-4 h-4 text-goldMain"></i> Clássico Dourado (Original)
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-stone-500"></i>
+                </div>
+
+                <div id="themeDropdownBubble" class="hidden absolute left-4 right-4 top-[80px] bg-darkSlate border border-stone-800 rounded-2xl shadow-2xl p-2 z-50 flex flex-col gap-1 modal-blur-enter">
+                    <button type="button" onclick="selectThemeOption('classic')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-deepBlack text-xs font-bold text-stone-200 flex items-center justify-between transition-all">
+                        <span class="flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4 text-goldMain"></i> Clássico Dourado</span>
+                        <i data-lucide="check" id="checkIconClassic" class="w-4 h-4 text-goldMain"></i>
+                    </button>
+                    <button type="button" onclick="selectThemeOption('emerald')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-deepBlack text-xs font-bold text-stone-200 flex items-center justify-between transition-all">
+                        <span class="flex items-center gap-2"><i data-lucide="gem" class="w-4 h-4 text-emerald-500"></i> Esmeralda / Kryptonita Cyber</span>
+                        <i data-lucide="check" id="checkIconEmerald" class="w-4 h-4 text-emerald-500 hidden"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="bg-deepBlack/50 border border-stone-800/80 p-4 rounded-2xl flex items-center justify-between gap-4">
                 <div class="flex flex-col gap-0.5">
                     <label class="text-xs font-bold text-stone-300 uppercase tracking-widest flex items-center gap-1">
                          Ativar Modo Psicólogo
                     </label>
-                    <span class="text-[10px] text-stone-500 font-mono uppercase leading-normal">Ignora o personagem para mapear sua psique e gerar autoconhecimento.</span>
+                    <span class="text-[10px] text-stone-500 font-mono uppercase leading-normal">Ignora o personagem para mapear sua psique.</span>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer shrink-0">
                     <input type="checkbox" id="psychoModeToggle" class="sr-only peer">
@@ -440,7 +578,7 @@
                     <label class="text-xs font-bold text-stone-300 uppercase tracking-widest flex items-center gap-1">
                         Acoplar Filosofia de Conduta
                     </label>
-                    <span class="text-[10px] text-stone-500 font-mono uppercase leading-normal">Mesclar matriz ideológica às resoluções práticas do bot.</span>
+                    <span class="text-[10px] text-stone-500 font-mono uppercase leading-normal">Mesclar matriz ideológica ao bot.</span>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer shrink-0">
                     <input type="checkbox" id="includePhilosophyToggle" class="sr-only peer">
@@ -459,7 +597,7 @@
             <div class="flex flex-col gap-1.5">
                 <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
                     <i data-lucide="lock" class="w-3.5 h-3.5 text-goldMain"></i>
-                    Redefinir Código Numérico (4 Dígitos)
+                    Redefinir PIN (4 Dígitos)
                 </label>
                 <input id="changePasswordInput" type="password" maxlength="4" placeholder="Vazio para manter código atual" class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-200 placeholder-stone-700 focus:outline-none focus:border-goldMain/50 transition-all font-mono tracking-widest">
             </div>
@@ -482,7 +620,7 @@
 
             <div class="flex flex-col gap-1.5">
                 <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <i data-lucide="terminal" class="w-3.5 h-3.5 text-goldMain"></i>
+                    <i data-lucide="gem" class="w-3.5 h-3.5 text-goldMain" id="customModIcon"></i>
                     Modificação Comportamental Expressa
                 </label>
                 <textarea id="customModInput" rows="2" placeholder="Diga exatamente como quer que o bot se expresse..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-200 placeholder-stone-700 focus:outline-none focus:border-goldMain/50 transition-all resize-none leading-relaxed"></textarea>
@@ -493,7 +631,7 @@
                     <i data-lucide="scroll" class="w-3.5 h-3.5 text-goldMain"></i>
                     Manifesto Ideológico de Suporte
                 </label>
-                <textarea id="manifestoInput" rows="4" placeholder="Cole aqui seu próprio manifesto de regras..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-300 font-mono focus:outline-none focus:border-goldMain/50 transition-all resize-y leading-relaxed"></textarea>
+                <textarea id="manifestoInput" rows="4" placeholder="Cole aqui seu próprio manifesto..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-300 font-mono focus:outline-none focus:border-goldMain/50 transition-all resize-y leading-relaxed"></textarea>
             </div>
 
             <button id="saveConfigBtn" class="w-full bg-gradient-to-r from-goldHover to-goldMain hover:brightness-110 text-deepBlack font-black text-xs tracking-widest py-3.5 rounded-xl transition-all shadow-md mt-2 uppercase shrink-0 active:scale-95">
@@ -510,7 +648,6 @@
                     <i data-lucide="file-edit" class="w-4 h-4"></i>
                     Ajustar Parâmetro de Entrada
                 </h4>
-                <p class="text-[10px] text-stone-500 uppercase tracking-wider">Modifique o comando enviado:</p>
             </div>
             <textarea id="editMessageTextArea" rows="4" class="w-full text-xs bg-deepBlack border border-stone-800 rounded-xl p-3 text-stone-200 focus:outline-none focus:border-goldMain transition-all leading-relaxed resize-none"></textarea>
             <div class="flex gap-3">
@@ -545,7 +682,6 @@
                     <i data-lucide="tags" class="w-4 h-4"></i>
                     Rotular Registro
                 </h4>
-                <p class="text-[10px] text-stone-500 uppercase tracking-wider">Defina a nova nomenclatura:</p>
             </div>
             <input id="renameInput" type="text" class="w-full text-xs bg-deepBlack border border-stone-800 rounded-xl p-3 text-stone-200 focus:outline-none focus:border-goldMain transition-all">
             <div class="flex gap-3">
@@ -555,7 +691,7 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION WITH SMOOTH POP -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 bg-deepBlack/95 border border-stone-800/80 px-4 py-2.5 rounded-2xl text-xs text-goldMain shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 scale-90 pointer-events-none z-50 backdrop-blur-md border-goldMain/20">
         <i data-lucide="check-circle-2" class="w-4 h-4 text-goldMain"></i>
         <span id="toastMsg">Matriz de dados atualizada</span>
@@ -582,6 +718,7 @@
         let userProfileData = "";
         let includePhilosophy = false;
         let psychoModeActive = false;
+        let selectedTheme = "classic";
         
         let conversations = {};
         let currentChatId = "";
@@ -590,9 +727,6 @@
         let userIsScrollingUp = false;
         
         let attachedImages = [];
-
-        let lastTapTime = 0;
-        let touchStartX = 0;
 
         let appSessionStartTime = Date.now();
 
@@ -617,7 +751,9 @@
                 const dot = document.getElementById(`dot-${i}`);
                 if (dot) {
                     if (i < currentPin.length) {
-                        dot.className = "w-4 h-4 rounded-full bg-gradient-to-tr from-goldHover to-goldMain shadow-lg border border-goldLight scale-110 transition-all duration-200";
+                        dot.className = selectedTheme === 'emerald'
+                            ? "w-4 h-4 rounded-full bg-gradient-to-tr from-emeraldHover to-emeraldAccent shadow-lg border border-emeraldLight scale-110 transition-all duration-200"
+                            : "w-4 h-4 rounded-full bg-gradient-to-tr from-goldHover to-goldMain shadow-lg border border-goldLight scale-110 transition-all duration-200";
                     } else {
                         dot.className = "w-4 h-4 rounded-full border border-stone-800 bg-transparent transition-all duration-200";
                     }
@@ -762,7 +898,7 @@
             }
         }
 
-        const configBtn = document.getElementById('configBtn');
+        const statsBtn = document.getElementById('statsBtn');
         const statsDropdownMenu = document.getElementById('statsDropdownMenu');
         const openConfigModalBtn = document.getElementById('openConfigModalBtn');
         const configModal = document.getElementById('configModal');
@@ -776,6 +912,11 @@
         const manifestoInput = document.getElementById('manifestoInput');
         const includePhilosophyToggle = document.getElementById('includePhilosophyToggle');
         const psychoModeToggle = document.getElementById('psychoModeToggle'); 
+        
+        const customThemeSelector = document.getElementById('customThemeSelector');
+        const themeDropdownBubble = document.getElementById('themeDropdownBubble');
+        const selectedThemeLabel = document.getElementById('selectedThemeLabel');
+
         const unifiedInput = document.getElementById('unifiedInput');
         const sendBtn = document.getElementById('sendBtn');
         const chatHistory = document.getElementById('chatHistory');
@@ -819,9 +960,42 @@
         const exportChatBtn = document.getElementById('exportChatBtn');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-        configBtn.addEventListener('click', toggleStatsMenu);
+        customThemeSelector.addEventListener('click', (e) => {
+            e.stopPropagation();
+            themeDropdownBubble.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!customThemeSelector.contains(e.target) && !themeDropdownBubble.contains(e.target)) {
+                themeDropdownBubble.classList.add('hidden');
+            }
+        });
+
+        function selectThemeOption(theme) {
+            selectedTheme = theme;
+            localStorage.setItem('app_theme', theme);
+            themeDropdownBubble.classList.add('hidden');
+            
+            const checkClassic = document.getElementById('checkIconClassic');
+            const checkEmerald = document.getElementById('checkIconEmerald');
+
+            if (theme === 'emerald') {
+                selectedThemeLabel.innerHTML = `<i data-lucide="gem" class="w-4 h-4 text-emerald-500"></i> Esmeralda / Kryptonita Cyber`;
+                checkClassic.classList.add('hidden');
+                checkEmerald.classList.remove('hidden');
+            } else {
+                selectedThemeLabel.innerHTML = `<i data-lucide="sun" class="w-4 h-4 text-goldMain"></i> Clássico Dourado (Original)`;
+                checkClassic.classList.remove('hidden');
+                checkEmerald.classList.add('hidden');
+            }
+            applyTheme(selectedTheme);
+            updatePinDisplay();
+            safeRenderIcons();
+        }
+
+        statsBtn.addEventListener('click', toggleStatsMenu);
         openConfigModalBtn.addEventListener('click', () => {
-            statsDropdownMenu.classList.add('hidden');
+            toggleSidebar();
             configModal.classList.remove('hidden');
         });
 
@@ -837,7 +1011,7 @@
         }
 
         document.addEventListener('click', (e) => {
-            if (!configBtn.contains(e.target) && !statsDropdownMenu.contains(e.target)) {
+            if (!statsBtn.contains(e.target) && !statsDropdownMenu.contains(e.target)) {
                 statsDropdownMenu.classList.add('hidden');
             }
         });
@@ -938,7 +1112,7 @@
 
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
+                document.documentElement.requestFullscreen().catch(() => {
                     showToast("Não foi possível ativar tela cheia.");
                 });
             } else {
@@ -1007,11 +1181,16 @@
 
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    attachedImages.push({
-                        base64: evt.target.result.split(',')[1],
-                        mimeType: file.type,
-                        previewSrc: evt.target.result
-                    });
+                    try {
+                        const base64Clean = evt.target.result.split(',')[1];
+                        attachedImages.push({
+                            base64: base64Clean,
+                            mimeType: file.type,
+                            previewSrc: evt.target.result
+                        });
+                    } catch(err) {
+                        console.error("Erro ao converter imagem", err);
+                    }
                     loadedCount++;
                     if (loadedCount === files.length) {
                         renderImagePreviews();
@@ -1084,7 +1263,56 @@
             }
         }
 
+        function runKryptoniteThreatScan() {
+            injectTrigger("⚡ [VARREDURA DE AMEAÇAS KRYPTONITA]: Execute um rastreamento instantâneo de riscos altos, vulnerabilidades veladas e alvos críticos no seguinte contexto: ");
+        }
+
+        function applyTheme(theme) {
+            selectedTheme = theme;
+            const body = document.getElementById('bodyContainer');
+            const headerLogoBox = document.getElementById('headerLogoBox');
+            const headerTitleText = document.getElementById('headerTitleText');
+            
+            const pinIconBox = document.getElementById('pinIconBox');
+            const pinGlow = document.getElementById('pinGlow');
+            const customModIcon = document.getElementById('customModIcon');
+
+            if (theme === 'emerald') {
+                body.classList.add('theme-emerald');
+                headerLogoBox.className = "bg-gradient-to-tr from-emerald-800 to-emerald-500 p-2 rounded-xl shadow-lg shadow-emerald-500/20";
+                headerLogoBox.innerHTML = `<i data-lucide="gem" class="w-5 h-5 text-emerald-950" id="headerLogoIcon"></i>`;
+                
+                headerTitleText.innerHTML = `KRYPTONITE OS <span class="text-[8px] text-emerald-950 bg-gradient-to-r from-emerald-300 to-emerald-500 px-2 py-0.5 rounded font-mono font-bold tracking-normal uppercase shadow-sm" id="headerBadge">CORE-X v3.0</span>`;
+                
+                if(pinIconBox) {
+                    pinIconBox.className = "relative bg-emeraldCard p-5 rounded-full shadow-2xl border border-emeraldAccent/40";
+                    pinIconBox.innerHTML = `<i data-lucide="gem" class="w-10 h-10 text-emeraldAccent animate-pulse-slow" id="pinIcon"></i>`;
+                }
+                if(pinGlow) pinGlow.className = "absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emeraldHover rounded-full blur-md opacity-50 animate-pulse-slow";
+                if(customModIcon) customModIcon.setAttribute('data-lucide', 'gem');
+            } else {
+                body.classList.remove('theme-emerald');
+                headerLogoBox.className = "eye-icon-box-gold p-2 rounded-xl shadow-lg";
+                headerLogoBox.innerHTML = `<i data-lucide="eye" class="w-5 h-5 eye-icon-gold" id="headerLogoIcon"></i>`;
+                
+                headerTitleText.innerHTML = `Sabedoria Oculta <span class="text-[8px] text-deepBlack bg-gradient-to-r from-goldLight to-goldMain px-2 py-0.5 rounded font-mono font-bold tracking-normal uppercase shadow-sm" id="headerBadge">Arcane Engine</span>`;
+                
+                if(pinIconBox) {
+                    pinIconBox.className = "relative eye-icon-box-gold p-5 rounded-full shadow-2xl";
+                    pinIconBox.innerHTML = `<i data-lucide="eye" class="w-10 h-10 eye-icon-gold animate-pulse-slow" id="pinIcon"></i>`;
+                }
+                if(pinGlow) pinGlow.className = "absolute -inset-1 bg-gradient-to-r from-goldMain to-goldHover rounded-full blur-md opacity-40 animate-pulse-slow";
+                if(customModIcon) customModIcon.setAttribute('data-lucide', 'terminal');
+            }
+            safeRenderIcons();
+        }
+
         function loadSettings() {
+            if (localStorage.getItem('app_theme')) {
+                selectedTheme = localStorage.getItem('app_theme');
+            }
+            applyTheme(selectedTheme);
+
             if (localStorage.getItem('user_api_key')) {
                 userApiKey = localStorage.getItem('user_api_key');
                 apiKeyInput.value = userApiKey;
@@ -1132,6 +1360,9 @@
                     conversations = {};
                 }
             }
+            
+            selectThemeOption(selectedTheme);
+
             if (localStorage.getItem('current_chat_id') && conversations[localStorage.getItem('current_chat_id')]) {
                 currentChatId = localStorage.getItem('current_chat_id');
             } else {
@@ -1261,9 +1492,53 @@
         });
 
         function loadChatMessagesIntoUI() {
-            const welcome = document.getElementById('welcomeMessage').cloneNode(true);
             chatHistory.innerHTML = "";
-            chatHistory.appendChild(welcome);
+            
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.id = "welcomeMessage";
+            welcomeDiv.className = "flex flex-col gap-2 max-w-[92%] self-start bg-darkSlate/90 border border-stone-800/80 p-4 rounded-2xl rounded-tl-none shadow-xl backdrop-blur-md animate-fade-in-up";
+            
+            const welcomeHeader = document.createElement('div');
+            welcomeHeader.className = "flex items-center justify-between border-b border-stone-800/60 pb-2";
+            
+            const welcomeSender = document.createElement('span');
+            welcomeSender.id = "welcomeSender";
+            welcomeSender.className = "text-[10px] text-goldMain font-extrabold uppercase tracking-widest flex items-center gap-1.5";
+            welcomeSender.innerHTML = `<i data-lucide="shield" class="w-3 h-3"></i> ${psychoModeActive ? "Analista Psíquico" : currentPersona}`;
+            
+            const welcomeVer = document.createElement('span');
+            welcomeVer.className = "text-[8px] text-stone-600 font-mono";
+            welcomeVer.innerText = "v2.6.0-AR";
+            
+            welcomeHeader.appendChild(welcomeSender);
+            welcomeHeader.appendChild(welcomeVer);
+            
+            const welcomeText = document.createElement('p');
+            welcomeText.id = "welcomeText";
+            welcomeText.className = "text-xs text-stone-300 leading-relaxed font-normal";
+            welcomeText.innerText = psychoModeActive 
+                ? "\"Modo de autoanálise comportamental ativado. Sem julgamentos ou barreiras morais, meu único objetivo é mapear seus padrões, mecanismos de defesa e funcionamento cognitivo para fazer você se entender melhor. O que vamos destrinchar hoje?\""
+                : `"${currentPersona} ativo e pareado ao terminal. Apresente os vetores do cenário. Processarei a lógica operacional sem atenuantes morais."`;
+                
+            const welcomeFooterDiv = document.createElement('div');
+            welcomeFooterDiv.className = "flex items-center justify-between mt-1 pt-2 border-t border-stone-800/40";
+            
+            const welcomeFooterText = document.createElement('span');
+            welcomeFooterText.id = "welcomeFooter";
+            welcomeFooterText.className = "text-[8px] text-stone-500 font-mono uppercase tracking-widest";
+            welcomeFooterText.innerText = psychoModeActive ? "Escopo: Mapeamento de Psique e Padrões" : (includePhilosophy ? "Escopo: Prático + Doutrinário" : "Escopo: Prática Analítica Pura");
+            
+            const welcomeDot = document.createElement('span');
+            welcomeDot.className = "inline-flex w-1.5 h-1.5 rounded-full bg-goldMain/60 animate-pulse";
+            
+            welcomeFooterDiv.appendChild(welcomeFooterText);
+            welcomeFooterDiv.appendChild(welcomeDot);
+            
+            welcomeDiv.appendChild(welcomeHeader);
+            welcomeDiv.appendChild(welcomeText);
+            welcomeDiv.appendChild(welcomeFooterDiv);
+            
+            chatHistory.appendChild(welcomeDiv);
 
             const activeChat = conversations[currentChatId];
             if (activeChat && activeChat.messages) {
@@ -1286,21 +1561,8 @@
             } else {
                 quickTriggersContainer.classList.remove('hidden');
             }
-            
-            const wSender = chatHistory.querySelector('#welcomeSender');
-            const wText = chatHistory.querySelector('#welcomeText');
-            const wFooter = chatHistory.querySelector('#welcomeFooter');
-            
-            if (psychoModeActive) {
-                if(wSender) wSender.innerText = "Analista Psíquico";
-                if(wText) wText.innerText = "\"Modo de autoanálise comportamental ativado. Sem julgamentos ou barreiras morais, meu único objetivo é mapear seus padrões, mecanismos de defesa e funcionamento cognitivo para fazer você se entender melhor. O que vamos destrinchar hoje?\"";
-                if(wFooter) wFooter.innerText = "Escopo: Mapeamento de Psique e Padrões";
-            } else {
-                if(wSender) wSender.innerText = currentPersona;
-                if(wText) wText.innerText = `"${currentPersona} ativo e pareado ao terminal. Apresente os vetores do cenário. Processarei a lógica operacional sem atenuantes morais."`;
-                if(wFooter) wFooter.innerText = includePhilosophy ? "Escopo: Prático + Doutrinário" : "Escopo: Prática Analítica Pura";
-            }
 
+            safeRenderIcons();
             chatScrollContainer.scrollTop = chatScrollContainer.scrollHeight;
         }
 
@@ -1317,21 +1579,11 @@
                 }
 
                 const activeClass = (id === currentChatId) 
-                    ? "bg-gradient-to-r from-darkSlate via-darkSlate to-goldMain/10 text-goldMain border-l-2 border-goldMain shadow-md gold-glow-sm" 
-                    : "hover:bg-darkSlate/50 text-stone-400 hover:text-stone-200 border-l-2 border-transparent";
+                    ? "bg-darkSlate text-goldMain border-l-4 border-goldMain shadow-md gold-glow-sm" 
+                    : "hover:bg-darkSlate/50 text-stone-400 hover:text-stone-200 border-l-2 border-stone-800/80";
                 
                 const item = document.createElement('div');
-                item.className = `group flex items-center justify-between p-3 rounded-xl text-xs font-medium tracking-wider cursor-pointer transition-all duration-200 ${activeClass}`;
-                
-                item.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, {passive: true});
-                item.addEventListener('touchend', (e) => {
-                    let diffX = touchStartX - e.changedTouches[0].clientX;
-                    if(diffX > 60) {
-                        if(confirm(`Deseja expurgar o registro "${chat.title}"?`)) {
-                            deleteChat(id, e);
-                        }
-                    }
-                }, {passive: true});
+                item.className = `group flex items-center justify-between p-3.5 rounded-xl text-xs font-medium tracking-wider cursor-pointer transition-all duration-200 ${activeClass} border border-stone-800/40`;
 
                 item.onclick = () => { selectChat(id); toggleSidebar(); };
 
@@ -1394,7 +1646,7 @@
                     localStorage.setItem('app_secure_pin', newPin);
                     changePasswordInput.value = "";
                 } else {
-                    showToast("O PIN deve ser composto por 4 números.");
+                    showToast("O PIN deve ter 4 números.");
                     return;
                 }
             }
@@ -1405,6 +1657,9 @@
             localStorage.setItem('current_persona', currentPersona);
             localStorage.setItem('user_profile_data', userProfileData);
             localStorage.setItem('include_philosophy', includePhilosophy);
+            localStorage.setItem('app_theme', selectedTheme);
+
+            applyTheme(selectedTheme);
 
             if(conversations[currentChatId]) {
                 conversations[currentChatId].persona = currentPersona;
@@ -1454,19 +1709,8 @@
         function appendMessageUI(sender, text, isUser, index = null, imagesSrcArray = null) {
             const msgDiv = document.createElement('div');
             msgDiv.className = isUser 
-                ? "flex flex-col gap-2 max-w-[92%] self-end bg-goldMain/10 border border-goldMain/30 p-4 rounded-2xl rounded-tr-none text-right relative group shadow-lg backdrop-blur-md shrink-0 select-text animate-fade-in-up"
-                : "flex flex-col gap-2 max-w-[92%] self-start bg-darkSlate/90 border border-stone-800 p-4 rounded-2xl rounded-tl-none relative group shadow-lg backdrop-blur-md shrink-0 select-text animate-fade-in-up";
-
-            if (isUser && index !== null) {
-                msgDiv.addEventListener('touchend', (e) => {
-                    let currentTime = new Date().getTime();
-                    let tapLength = currentTime - lastTapTime;
-                    if (tapLength < 300 && tapLength > 0) {
-                        editUserMessage(index);
-                    }
-                    lastTapTime = currentTime;
-                });
-            }
+                ? "msg-user-box flex flex-col gap-2 max-w-[92%] self-end bg-goldMain/10 border border-goldMain/30 p-4 rounded-2xl rounded-tr-none text-right relative group shadow-lg backdrop-blur-md shrink-0 select-text animate-fade-in-up"
+                : "msg-ai-box flex flex-col gap-2 max-w-[92%] self-start bg-darkSlate/90 border border-stone-800 p-4 rounded-2xl rounded-tl-none relative group shadow-lg backdrop-blur-md shrink-0 select-text animate-fade-in-up";
 
             const senderSpan = document.createElement('span');
             senderSpan.className = isUser ? "text-[10px] text-stone-400 font-extrabold uppercase tracking-widest" : "text-[10px] text-goldMain font-extrabold uppercase tracking-widest";
@@ -1475,21 +1719,31 @@
             senderSpan.innerText = `[#${msgNumber}] ${sender}`;
             msgDiv.appendChild(senderSpan);
 
-            if (imagesSrcArray && imagesSrcArray.length > 0) {
+            if (imagesSrcArray && Array.isArray(imagesSrcArray) && imagesSrcArray.length > 0) {
                 const imgGrid = document.createElement('div');
                 imgGrid.className = "flex flex-wrap gap-2 my-1.5 self-start";
                 imagesSrcArray.forEach(src => {
-                    const attachedImg = document.createElement('img');
-                    attachedImg.src = src;
-                    attachedImg.className = "max-w-[120px] max-h-32 object-cover rounded-xl border border-stone-800 shadow-inner";
-                    imgGrid.appendChild(attachedImg);
+                    if (src) {
+                        const attachedImg = document.createElement('img');
+                        attachedImg.src = src;
+                        attachedImg.className = "max-w-[120px] max-h-32 object-cover rounded-xl border border-stone-800 shadow-inner";
+                        imgGrid.appendChild(attachedImg);
+                    }
                 });
                 msgDiv.appendChild(imgGrid);
             }
 
-            const textP = document.createElement('p');
-            textP.className = "text-xs text-stone-200 leading-relaxed whitespace-pre-line text-left break-words pb-3 font-normal";
-            textP.innerText = text;
+            const textP = document.createElement('div');
+            textP.className = isUser 
+                ? "text-xs text-stone-200 leading-relaxed whitespace-pre-line text-left break-words pb-3 font-normal"
+                : "ai-formatted-text text-left break-words pb-3";
+
+            if (!isUser && typeof marked !== 'undefined') {
+                textP.innerHTML = marked.parse(text || "");
+            } else {
+                textP.innerText = text || "";
+            }
+
             msgDiv.appendChild(textP);
 
             const actionsDiv = document.createElement('div');
@@ -1526,7 +1780,7 @@
                 conversations[currentChatId].messages.push({ sender, text, isUser, imagesSrc: imagesSrcArray });
                 
                 if(isUser && (conversations[currentChatId].title === "Consulta Estrutural Nova" || conversations[currentChatId].title === "Análise Psicológica")) {
-                    const cleanTitle = (text || "Mídia Anexada").substring(0, 25).toUpperCase() + "...";
+                    const cleanTitle = (text || "Anexo Enviado").substring(0, 25).toUpperCase() + "...";
                     conversations[currentChatId].title = cleanTitle;
                 }
                 saveConversations();
@@ -1536,100 +1790,104 @@
         }
 
         sendBtn.addEventListener('click', async () => {
-            const promptContent = unifiedInput.value.trim();
+            try {
+                const promptContent = unifiedInput.value.trim();
 
-            if (!promptContent && attachedImages.length === 0) return;
+                if (!promptContent && attachedImages.length === 0) return;
 
-            if (!userApiKey) {
-                showToast("Insira o Token de Acesso da API.");
-                updateLatencyStatusIndicator("red");
-                configModal.classList.remove('hidden');
-                return;
-            }
+                if (!userApiKey) {
+                    showToast("Insira a Chave de API no Painel Geral.");
+                    updateLatencyStatusIndicator("red");
+                    configModal.classList.remove('hidden');
+                    return;
+                }
 
-            sendBtn.disabled = true;
-            quickTriggersContainer.classList.add('hidden'); 
-            
-            const snapshotImagesSrc = attachedImages.length > 0 ? attachedImages.map(img => img.previewSrc) : null;
-            const currentAttachedImages = [...attachedImages];
+                sendBtn.disabled = true;
+                quickTriggersContainer.classList.add('hidden'); 
 
-            appendMessage("Você", promptContent, true, snapshotImagesSrc);
-            
-            unifiedInput.value = "";
-            localStorage.setItem('draft_unified', "");
-            autoResizeInput();
-            updateCharCounter();
+                const snapshotImagesSrc = attachedImages.length > 0 ? attachedImages.map(img => img.previewSrc) : null;
+                const currentAttachedImages = [...attachedImages];
 
-            chatHistory.appendChild(geminiThinking);
-            geminiThinking.classList.remove('hidden');
-            
-            if (!userIsScrollingUp) {
-                chatScrollContainer.scrollTo({
-                    top: chatScrollContainer.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }
+                const historyBeforeCurrent = conversations[currentChatId]?.messages ? [...conversations[currentChatId].messages] : [];
 
-            let systemInstruction = "";
+                appendMessage("Você", promptContent, true, snapshotImagesSrc);
 
-            if (psychoModeActive) {
-                systemInstruction = `
-                Você é um Analista de Psicologia Comportamental de Inteligência Avançada, focado em guiar o usuário rumo ao autoconhecimento e desconstrução de padrões lógicos.
-                Se houver imagens anexadas, você deve analisá-las sob a ótica da linguagem corporal, comportamento ou subtexto implícito.
-                DADOS DE HISTÓRICO DO OPERADOR: ${userProfileData || "Nenhum fornecido."}
-                `;
-            } else {
-                const scopeInstruction = includePhilosophy 
-                    ? "Você deve fundir os conhecimentos práticos e a FILOSOFIA moral/de vida do personagem para responder."
-                    : "Foques em EXTRAIR E ENSINAR APENAS AS HABILIDADES ANALÍTICAS, estratégias puras e capacidades técnicas dele.";
+                unifiedInput.value = "";
+                localStorage.setItem('draft_unified', "");
+                autoResizeInput();
+                updateCharCounter();
 
-                systemInstruction = `
-                Você assumirá o intelecto, frieza e perícia analítica pura do personagem: ${currentPersona}.
-                Se imagens forem fornecidas, mapeie falhas lógicas, vulnerabilidades táticas ou cenários contidos nelas.
-                DADOS DO USUÁRIO OPERADOR: ${userProfileData || "Nenhum."}
-                Filosofia: ${activePhilosophy || "Nenhuma."}
-                Modificação de Comportamento: ${customModification || "Estratégico e conciso."}
-                ${scopeInstruction}
-                `;
-            }
+                chatHistory.appendChild(geminiThinking);
+                geminiThinking.classList.remove('hidden');
 
-            const rawHistory = conversations[currentChatId]?.messages || [];
-            const structuralContents = [];
-            const slicedHistory = rawHistory.slice(-190);
-            
-            slicedHistory.forEach(msg => {
-                if(msg.text) {
-                    structuralContents.push({
-                        role: msg.isUser ? "user" : "model",
-                        parts: [{ text: msg.text }]
+                if (!userIsScrollingUp) {
+                    chatScrollContainer.scrollTo({
+                        top: chatScrollContainer.scrollHeight,
+                        behavior: 'smooth'
                     });
                 }
-            });
 
-            const currentParts = [];
-            if (currentAttachedImages.length > 0) {
-                currentAttachedImages.forEach(img => {
-                    currentParts.push({
-                        inlineData: {
-                            mimeType: img.mimeType,
-                            data: img.base64
+                let systemInstruction = "";
+
+                if (psychoModeActive) {
+                    systemInstruction = `
+                    Você é um Analista de Psicologia Comportamental. Mapeie padrões cognitivos e psicológicos do operador.
+                    DADOS DO OPERADOR: ${userProfileData || "Nenhum fornecido."}
+                    Formate as respostas com visual bonito, parágrafos limpos, tópicos estruturados e sem símbolos markdown brutos.
+                    `;
+                } else {
+                    const scopeInstruction = includePhilosophy 
+                        ? "Você deve fundir os conhecimentos práticos e a FILOSOFIA moral do personagem para responder."
+                        : "Foque em EXTRAIR APENAS AS HABILIDADES ANALÍTICAS e estratégias puras dele.";
+
+                    systemInstruction = `
+                    Você assumirá o intelecto e perícia do personagem: ${currentPersona}.
+                    DADOS DO OPERADOR: ${userProfileData || "Nenhum."}
+                    Filosofia: ${activePhilosophy || "Nenhuma."}
+                    Modificação de Comportamento: ${customModification || "Estratégico e conciso."}
+                    ${scopeInstruction}
+                    Formate as respostas organizadas, com listas limpas e leitura confortável.
+                    `;
+                }
+
+                const structuralContents = [];
+                const slicedHistory = historyBeforeCurrent.slice(-18);
+                
+                slicedHistory.forEach(msg => {
+                    if(msg.text && msg.text.trim() !== "") {
+                        structuralContents.push({
+                            role: msg.isUser ? "user" : "model",
+                            parts: [{ text: msg.text }]
+                        });
+                    }
+                });
+
+                const currentParts = [];
+                if (currentAttachedImages && currentAttachedImages.length > 0) {
+                    currentAttachedImages.forEach(img => {
+                        if (img && img.base64 && img.mimeType) {
+                            currentParts.push({
+                                inlineData: {
+                                    mimeType: img.mimeType,
+                                    data: img.base64
+                                }
+                            });
                         }
                     });
+                }
+
+                currentParts.push({ text: promptContent || "Analise a imagem acoplada." });
+
+                structuralContents.push({
+                    role: "user",
+                    parts: currentParts
                 });
-            }
-            currentParts.push({ text: promptContent || "Analise as imagens fornecidas com base nas suas diretrizes." });
 
-            structuralContents.push({
-                role: "user",
-                parts: currentParts
-            });
+                clearAttachedImage();
 
-            clearAttachedImage();
+                const startTime = Date.now();
+                updateLatencyStatusIndicator("yellow");
 
-            const startTime = Date.now();
-            updateLatencyStatusIndicator("yellow");
-
-            try {
                 const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
                 
                 const response = await fetch(apiEndpoint, {
@@ -1647,7 +1905,10 @@
                     })
                 });
 
-                if (!response.ok) throw new Error("Erro na rede ou token offline.");
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || "Erro na resposta da API.");
+                }
 
                 const result = await response.json();
                 const textResult = result.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -1662,14 +1923,15 @@
                     const responderName = psychoModeActive ? "Analista Psíquico" : currentPersona;
                     appendMessage(responderName, textResult, false);
                 } else {
-                    appendMessage("Erro de Processamento", "A API não retornou respostas válidas.", false);
+                    appendMessage("Erro de Processamento", "A API não retornou texto válido.", false);
                 }
 
             } catch (err) {
-                console.error(err);
+                console.error("Erro no envio:", err);
                 geminiThinking.classList.add('hidden');
                 updateLatencyStatusIndicator("red");
-                appendMessage("Falha de Conexão", "Instabilidade detectada no envio. Verifique a rede ou a chave da API instalada.", false);
+                showToast("Erro: " + (err.message || "Falha ao enviar mensagem."));
+                appendMessage("Falha de Conexão", `Não foi possível processar: ${err.message}`, false);
             } finally {
                 sendBtn.disabled = false;
             }
