@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="pt-BR" id="htmlRoot" class="dark selection:bg-emerald-500/30">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sabedoria Oculta - Arcane Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        deepBlack: '#050505',
+                        darkSlate: '#0f1115',
+                        goldMain: '#d4af37',
+                        goldHover: '#aa882c',
+                        goldLight: '#f3e5ab',
+                        accentRed: '#ff4444',
+                        emeraldBg: '#040d0a',
+                        emeraldCard: '#081712',
+                        emeraldBorder: '#10382b',
+                        emeraldAccent: '#10b981',
+                        emeraldHover: '#059669',
+                        emeraldLight: '#34d399'
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gemini-pulse': 'geminiPulse 1.8s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(12px) scale(0.98)' },
+                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' }
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.92)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e222a;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+        html, body {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior: none;
+            touch-action: manipulation;
+        }
+        
+        .gemini-loader {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+        }
+        .gemini-loader div {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f3e5ab, #d4af37);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            animation: geminiWave 1.4s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+        .gemini-loader div:nth-child(1) { animation-delay: 0s; }
+        .gemini-loader div:nth-child(2) { animation-delay: 0.18s; background: linear-gradient(135deg, #d4af37, #aa882c); }
+        .gemini-loader div:nth-child(3) { animation-delay: 0.36s; background: linear-gradient(135deg, #aa882c, #f3e5ab); }
+        
+        @keyframes geminiWave {
+            0%, 100% { transform: translateY(0) scale(0.8); opacity: 0.3; }
+            50% { transform: translateY(-6px) scale(1.3); opacity: 1; box-shadow: 0 0 14px rgba(212, 175, 55, 0.8); }
+        }
+
+        .scrollable-area {
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .gold-glow-sm { box-shadow: 0 0 12px -2px rgba(212, 175, 55, 0.25); }
+
+        .modal-blur-enter {
+            animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .btn-pin {
+            outline: none !important;
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .btn-pin:active {
+            transform: scale(0.92) translateY(1px) !important;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3) !important;
+        }
+
+        #inputBoxContainer {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+        }
+        #inputBoxContainer:focus-within {
+            border-color: rgba(212, 175, 55, 0.6) !important;
+            box-shadow: 0 0 20px -3px rgba(212, 175, 55, 0.3) !important;
+            transform: translateY(-2px);
+        }
+
+        .ai-formatted-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e4e4e7;
+        }
+        .ai-formatted-text p { margin-bottom: 0.85rem; }
+        .ai-formatted-text p:last-child { margin-bottom: 0; }
+        .ai-formatted-text strong { color: #ffffff; font-weight: 700; }
+        .ai-formatted-text ul, .ai-formatted-text ol { padding-left: 1.25rem; margin-bottom: 0.85rem; }
+        .ai-formatted-text ul { list-style-type: disc; }
+        .ai-formatted-text ol { list-style-type: decimal; }
+        .ai-formatted-text li { margin-bottom: 0.4rem; }
+
+        /* ESTILO DO OLHO PRETO E DOURADO */
+        .eye-icon-box-gold {
+            background: linear-gradient(135deg, #0d0b05, #1d180a) !important;
+            border: 1px solid rgba(212, 175, 55, 0.4) !important;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2) !important;
+        }
+        .eye-icon-gold {
+            color: #d4af37 !important;
+            filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.6));
+        }
+
+        /* REGRAS TOTAIS DO TEMA ESMERALDA / KRYPTONITA */
+        body.theme-emerald {
+            background-color: #020907 !important;
+            color: #d1fae5 !important;
+            font-family: monospace, monospace !important;
+        }
+        body.theme-emerald #loginScreen {
+            background-color: rgba(2, 9, 7, 0.98) !important;
+        }
+        body.theme-emerald .btn-pin {
+            background-color: rgba(8, 23, 18, 0.8) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            color: #d1fae5 !important;
+        }
+        body.theme-emerald .btn-pin:hover {
+            border-color: rgba(16, 185, 129, 0.8) !important;
+            background-color: rgba(16, 185, 129, 0.15) !important;
+        }
+        body.theme-emerald ::-webkit-scrollbar-thumb {
+            background: #10382b !important;
+        }
+        body.theme-emerald ::-webkit-scrollbar-thumb:hover {
+            background: #10b981 !important;
+        }
+        body.theme-emerald header {
+            background-color: rgba(4, 13, 10, 0.95) !important;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+        body.theme-emerald #sidebarMenu {
+            background-color: rgba(2, 9, 7, 0.98) !important;
+            border-right: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+        body.theme-emerald .bg-darkSlate {
+            background-color: #081712 !important;
+        }
+        body.theme-emerald .border-stone-800, body.theme-emerald .border-stone-800\/80, body.theme-emerald .border-stone-800\/60 {
+            border-color: rgba(16, 185, 129, 0.25) !important;
+        }
+        body.theme-emerald .text-goldMain, body.theme-emerald .text-goldLight {
+            color: #10b981 !important;
+        }
+        body.theme-emerald .bg-goldMain {
+            background-color: #10b981 !important;
+            color: #020907 !important;
+        }
+        body.theme-emerald .border-goldMain, body.theme-emerald .border-goldMain\/30, body.theme-emerald .border-goldMain\/40 {
+            border-color: #10b981 !important;
+        }
+        body.theme-emerald #includePhilosophyToggle:checked + div {
+            background-color: #10b981 !important;
+        }
+        body.theme-emerald #mainAppContainer {
+            border-left: 1px dashed rgba(16, 185, 129, 0.2);
+            border-right: 1px dashed rgba(16, 185, 129, 0.2);
+        }
+        body.theme-emerald #inputBoxContainer {
+            background-color: rgba(8, 23, 18, 0.95) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald #inputBoxContainer:focus-within {
+            border-color: rgba(16, 185, 129, 0.9) !important;
+            box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald .gemini-loader div {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+        }
+        body.theme-emerald #tacticalExtraPanel {
+            display: flex !important;
+        }
+        body.theme-emerald #toast {
+            border-color: rgba(16, 185, 129, 0.4) !important;
+            color: #10b981 !important;
+        }
+        body.theme-emerald .msg-user-box {
+            background-color: rgba(16, 185, 129, 0.12) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald .msg-ai-box {
+            background-color: rgba(8, 23, 18, 0.95) !important;
+            border-color: rgba(16, 185, 129, 0.25) !important;
+        }
+        body.theme-emerald #sendBtn {
+            background: linear-gradient(135deg, #059669, #10b981) !important;
+            color: #020907 !important;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
+        }
+        body.theme-emerald #saveConfigBtn {
+            background: linear-gradient(135deg, #059669, #10b981) !important;
+            color: #020907 !important;
+        }
+        body.theme-emerald #newChatBtn {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(8, 23, 18, 0.8)) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+            color: #10b981 !important;
+        }
+        body.theme-emerald .trigger-card {
+            background-color: rgba(8, 23, 18, 0.6) !important;
+            border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+        body.theme-emerald .trigger-card:hover {
+            border-color: rgba(16, 185, 129, 0.8) !important;
+            background-color: rgba(8, 23, 18, 0.9) !important;
+        }
+    </style>
+</head>
+<body id="bodyContainer" class="bg-deepBlack text-stone-100 font-sans flex flex-col justify-between select-none">
+
+    <!-- LOGIN / PIN SCREEN -->
+    <div id="loginScreen" class="fixed inset-0 bg-deepBlack/95 backdrop-blur-2xl z-50 flex flex-col items-center justify-center p-6 transition-all duration-500">
+        <div class="w-full max-w-sm flex flex-col items-center gap-8 animate-pop-in">
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-goldMain to-goldHover rounded-full blur-md opacity-40 group-hover:opacity-80 transition duration-500 animate-pulse-slow" id="pinGlow"></div>
+                <div class="relative eye-icon-box-gold p-5 rounded-full shadow-2xl" id="pinIconBox">
+                    <i data-lucide="eye" class="w-10 h-10 eye-icon-gold animate-pulse-slow" id="pinIcon"></i>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <h2 id="loginTitle" class="text-lg font-black tracking-widest uppercase text-transparent bg-clip-text bg-gradient-to-r from-goldLight via-goldMain to-goldHover">Núcleo Cognitivo</h2>
+                <p id="loginSubtitle" class="text-[10px] text-stone-500 font-mono mt-1.5 uppercase tracking-widest">Autenticar Assinatura Digital</p>
+            </div>
+
+            <div id="lockoutContainer" class="hidden flex flex-col items-center gap-2 my-4 cursor-pointer select-none" onclick="handleTimerClick()">
+                <div class="text-accentRed font-mono font-bold text-3xl tracking-wider animate-pulse" id="countdownTimer">24:00:00</div>
+                <p class="text-[10px] text-stone-500 font-mono uppercase tracking-widest">Acesso Negado: Terminal Bloqueado</p>
+            </div>
+
+            <div id="keyboardContainer" class="w-full flex flex-col items-center gap-8">
+                <div class="flex gap-5 my-2">
+                    <div id="dot-0" class="w-4 h-4 rounded-full border border-stone-800 bg-transparent transition-all duration-300"></div>
+                    <div id="dot-1" class="w-4 h-4 rounded-full border border-stone-800 bg-transparent transition-all duration-300"></div>
+                    <div id="dot-2" class="w-4 h-4 rounded-full border border-stone-800 bg-transparent transition-all duration-300"></div>
+                    <div id="dot-3" class="w-4 h-4 rounded-full border border-stone-800 bg-transparent transition-all duration-300"></div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3.5 w-full max-w-[280px] mt-2">
+                    <button type="button" onclick="pressKey('1')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">1</button>
+                    <button type="button" onclick="pressKey('2')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">2</button>
+                    <button type="button" onclick="pressKey('3')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">3</button>
+                    
+                    <button type="button" onclick="pressKey('4')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">4</button>
+                    <button type="button" onclick="pressKey('5')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">5</button>
+                    <button type="button" onclick="pressKey('6')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">6</button>
+                    
+                    <button type="button" onclick="pressKey('7')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">7</button>
+                    <button type="button" onclick="pressKey('8')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">8</button>
+                    <button type="button" onclick="pressKey('9')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">9</button>
+                    
+                    <button type="button" onclick="clearKeys()" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl flex items-center justify-center text-accentRed hover:bg-red-950/30 shadow-md">
+                        <i data-lucide="shield-x" class="w-6 h-6"></i>
+                    </button>
+                    <button type="button" onclick="pressKey('0')" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl font-mono text-xl font-bold hover:bg-stone-900 hover:border-goldMain/40 text-stone-200 shadow-md">0</button>
+                    <button type="button" onclick="backspaceKey()" class="btn-pin h-16 bg-darkSlate/80 border border-stone-800/80 rounded-2xl flex items-center justify-center text-stone-500 hover:bg-stone-900 shadow-md">
+                        <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR MENU -->
+    <div id="sidebarMenu" class="fixed inset-y-0 left-0 w-[310px] bg-deepBlack/95 backdrop-blur-2xl border-r border-stone-800/60 z-50 transform -translate-x-full transition-transform duration-300 ease-out flex flex-col justify-between shadow-2xl h-full overflow-hidden">
+        <div class="flex flex-col flex-1 p-5 gap-4 overflow-hidden">
+            <div class="flex items-center justify-between border-b border-stone-800/60 pb-4 shrink-0">
+                <span class="text-[11px] font-black tracking-widest uppercase text-stone-400 flex items-center gap-2" id="sidebarTitle">
+                    <i data-lucide="folder-kanban" class="w-4 h-4 text-goldMain"></i>
+                    Registros de Consulta
+                </span>
+                <button id="closeSidebarBtn" class="p-1.5 hover:bg-stone-900 rounded-xl text-stone-400 hover:text-stone-200 transition-all active:scale-90">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <button id="newChatBtn" class="w-full bg-gradient-to-r from-goldMain/10 via-darkSlate to-goldMain/5 border border-goldMain/30 hover:border-goldMain text-goldMain text-xs font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all active:scale-95 shrink-0 gold-glow-sm">
+                <i data-lucide="sparkles" class="w-4 h-4 text-goldMain"></i>
+                <span id="newChatText">Iniciar Nova Linha</span>
+            </button>
+
+            <div class="relative shrink-0 mt-1">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-stone-600"></i>
+                <input id="searchChatInput" type="text" placeholder="Filtrar registros..." class="w-full text-xs bg-darkSlate/60 border border-stone-800/80 rounded-xl pl-8 pr-3 py-2 text-stone-300 placeholder-stone-600 focus:outline-none focus:border-goldMain/40 transition-all font-mono">
+            </div>
+
+            <div class="flex flex-col gap-2 flex-1 overflow-y-auto mt-1 scrollable-area pr-1" id="chatListContainer"></div>
+
+            <div class="border-t border-stone-800/60 pt-3 mt-auto shrink-0">
+                <button id="openConfigModalBtn" class="w-full bg-darkSlate border border-stone-800 hover:bg-stone-900 text-stone-300 text-[11px] font-bold tracking-widest uppercase py-3 rounded-xl transition-all flex items-center justify-center gap-2 hover:border-goldMain/40">
+                    <i data-lucide="settings" class="w-4 h-4 text-goldMain"></i>
+                    <span id="configBtnText">Painel Geral / Config</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-stone-800/60 bg-darkSlate/40 flex items-center justify-between shrink-0 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-goldMain/15 flex items-center justify-center text-xs font-black text-goldMain border border-goldMain/30 shadow-inner" id="userBadgeIcon">Ω</div>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold tracking-wider text-stone-300 uppercase" id="userNameLabel">Operador Supremo</span>
+                    <span class="text-[9px] text-stone-500 font-mono">Sessão Criptografada</span>
+                </div>
+            </div>
+            <div class="w-2 h-2 rounded-full bg-goldMain animate-ping shadow-[0_0_8px_#d4af37]" id="userStatusPing"></div>
+        </div>
+    </div>
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-45 hidden transition-opacity duration-300"></div>
+
+    <!-- HEADER -->
+    <header class="bg-deepBlack/80 backdrop-blur-md border-b border-stone-800/60 px-4 py-3.5 flex items-center justify-between shrink-0 z-40 relative">
+        <div class="flex items-center gap-3">
+            <button id="openSidebarBtn" class="p-2 text-stone-400 hover:text-goldMain hover:bg-darkSlate/60 rounded-xl transition-all active:scale-90 border border-transparent hover:border-stone-800">
+                <i data-lucide="layers" class="w-5 h-5"></i>
+            </button>
+            <div class="flex items-center gap-3">
+                <div class="eye-icon-box-gold p-2 rounded-xl shadow-lg" id="headerLogoBox">
+                    <i data-lucide="eye" class="w-5 h-5 eye-icon-gold" id="headerLogoIcon"></i>
+                </div>
+                <div>
+                    <h1 class="text-xs font-black tracking-widest uppercase text-stone-100 flex items-center gap-2" id="headerTitleText">
+                        Sabedoria Oculta <span class="text-[8px] text-deepBlack bg-gradient-to-r from-goldLight to-goldMain px-2 py-0.5 rounded font-mono font-bold tracking-normal uppercase shadow-sm" id="headerBadge">Arcane Engine</span>
+                    </h1>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]" id="latencyDot"></span>
+                        <span class="text-[9px] text-stone-500 font-mono tracking-wider uppercase" id="latencyStatus">Desconectado // Sem Chave</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+            <button id="exportChatBtn" class="p-2 text-stone-400 hover:text-goldMain hover:bg-darkSlate/60 rounded-xl transition-all active:scale-90 border border-transparent hover:border-stone-800" title="Exportar Relatório Tático (.txt)">
+                <i data-lucide="download" class="w-5 h-5"></i>
+            </button>
+
+            <button id="fullscreenBtn" class="p-2 text-stone-400 hover:text-goldMain hover:bg-darkSlate/60 rounded-xl transition-all active:scale-90 border border-transparent hover:border-stone-800" title="Modo Foco Total">
+                <i data-lucide="maximize" class="w-5 h-5"></i>
+            </button>
+
+            <div class="relative">
+                <button id="statsBtn" class="p-2 text-stone-400 hover:text-goldMain hover:bg-darkSlate/60 rounded-xl transition-all active:scale-90 border border-transparent hover:border-stone-800" title="Métricas">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                </button>
+                
+                <div id="statsDropdownMenu" class="absolute right-0 mt-2 w-64 bg-deepBlack/95 backdrop-blur-2xl border border-stone-800 rounded-2xl shadow-2xl p-4 hidden z-50 flex flex-col gap-3 modal-blur-enter">
+                    <div class="border-b border-stone-800/80 pb-2 flex items-center justify-between">
+                        <span class="text-[10px] font-black tracking-widest uppercase text-goldMain flex items-center gap-1.5" id="statsTitle">
+                            <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                            Métricas do Sistema
+                        </span>
+                        <button onclick="toggleStatsMenu(event)" class="text-stone-600 hover:text-stone-400 transition-all"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between items-center text-[11px] font-mono">
+                            <span class="text-stone-500 uppercase tracking-wider">Tempo Ativo:</span>
+                            <span id="appTimeSpent" class="text-stone-200 font-bold">00:00:00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px] font-mono">
+                            <span class="text-stone-500 uppercase tracking-wider">Último Acesso:</span>
+                            <span id="appLastAccess" class="text-stone-200 font-bold">--/--/-- --:--</span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px] font-mono">
+                            <span class="text-stone-500 uppercase tracking-wider">Espaço Ocupado:</span>
+                            <span id="appStorageSize" class="text-stone-200 font-bold">0.00 KB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- EXTRA TACTICAL PANEL (MODO KRYPTONITA EXCLUSIVO) -->
+    <div id="tacticalExtraPanel" class="hidden bg-emeraldCard border-b border-emeraldBorder px-4 py-2 text-[10px] font-mono flex flex-wrap items-center justify-between text-emeraldLight gap-2">
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5 font-bold"><i data-lucide="shield-alert" class="w-3.5 h-3.5 text-emeraldAccent animate-pulse"></i> PAINEL KRYPTONITA EXCLUSIVO</span>
+            <span class="hidden sm:flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3 text-emeraldAccent"></i> CRIPTOGRAFIA VERDE ATIVA</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="runKryptoniteThreatScan()" class="hover:bg-emeraldAccent hover:text-emeraldBg uppercase border border-emeraldBorder px-2.5 py-1 rounded bg-emeraldBg transition-all flex items-center gap-1 font-bold">
+                <i data-lucide="radar" class="w-3 h-3 text-emeraldAccent"></i> Varredura de Ameaças (Threat Scan)
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CHAT PANEL -->
+    <main id="mainAppContainer" class="flex-1 flex flex-col w-full max-w-2xl mx-auto p-4 overflow-hidden justify-between relative h-full">
+        
+        <div class="flex-1 flex flex-col overflow-y-auto mb-36 scroll-smooth scrollable-area pr-1 gap-6" id="chatScrollContainer">
+            <div id="chatHistory" class="flex flex-col gap-6 p-1">
+                <div id="welcomeMessage" class="flex flex-col gap-2 max-w-[92%] self-start bg-darkSlate/90 border border-stone-800/80 p-4 rounded-2xl rounded-tl-none shadow-xl backdrop-blur-md animate-fade-in-up">
+                    <div class="flex items-center justify-between border-b border-stone-800/60 pb-2">
+                        <span id="welcomeSender" class="text-[10px] text-goldMain font-extrabold uppercase tracking-widest flex items-center gap-1.5">
+                            <i data-lucide="shield" class="w-3 h-3"></i> Oráculo
+                        </span>
+                        <span class="text-[8px] text-stone-600 font-mono">v2.6.0-AR</span>
+                    </div>
+                    <p id="welcomeText" class="text-xs text-stone-300 leading-relaxed font-normal">
+                        "Parâmetros estabelecidos. Insira os dados estruturais do cenário. Processarei a lógica de ação pura."
+                    </p>
+                    <div class="flex items-center justify-between mt-1 pt-2 border-t border-stone-800/40">
+                        <span class="text-[8px] text-stone-500 font-mono uppercase tracking-widest" id="welcomeFooter">Modo: Vetor de Eficácia Absoluta</span>
+                        <span class="inline-flex w-1.5 h-1.5 rounded-full bg-goldMain/60 animate-pulse"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="quickTriggersContainer" class="grid grid-cols-2 gap-2.5 mt-2 px-1 shrink-0 animate-fade-in-up">
+                <button onclick="injectTrigger('Mapeie todas as vulnerabilidades lógicas e falhas ocultas do seguinte cenário: ')" class="trigger-card p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
+                    <div class="flex items-center gap-2 text-goldMain mb-1">
+                        <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>
+                        <span class="text-[9px] font-extrabold tracking-widest uppercase">Vulnerabilidades</span>
+                    </div>
+                    <p class="text-[11px] text-stone-400 group-hover:text-stone-200 transition-colors line-clamp-1">Encontrar brechas lógicas críticas.</p>
+                </button>
+                <button onclick="injectTrigger('Simule a reação exata e as contramedidas prováveis para a seguinte ação: ')" class="trigger-card p-3 bg-darkSlate/40 border border-stone-800/80 hover:border-goldMain/40 hover:bg-darkSlate/80 text-left rounded-2xl transition-all duration-200 active:scale-95 group shadow-sm">
+                    <div class="flex items-center gap-2 text-goldMain mb-1">
+                        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                        <span class="text-[9px] font-extrabold tracking-widest uppercase">Simular Reação</span>
+                    </div>
+                    <p class="text-[11px] text-stone-400 group-hover:text-stone-200 transition-colors line-clamp-1">Prever a resposta do alvo.</p>
+                </button>
+            </div>
+
+            <!-- GEMINI THINKING ANIMATION -->
+            <div id="geminiThinking" class="hidden flex flex-col gap-1.5 max-w-[90%] self-start bg-darkSlate/90 border border-stone-800 p-3.5 rounded-2xl rounded-tl-none mt-2 shadow-xl backdrop-blur-md animate-fade-in-up">
+                <span id="thinkingSender" class="text-[10px] text-goldMain font-extrabold uppercase tracking-widest flex items-center gap-1.5">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 animate-spin"></i> Oráculo
+                </span>
+                <div class="gemini-loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+
+            <div id="memoryLimitWarning" class="hidden text-center text-xs text-goldMain font-semibold uppercase tracking-wider animate-pulse py-3 bg-goldMain/5 border border-goldMain/20 rounded-xl my-2">
+                🔄 Reciclagem de Memória de Curto Prazo Ativada.
+            </div>
+        </div>
+
+        <!-- INPUT CONTAINER -->
+        <div id="inputBoxContainer" class="absolute bottom-4 left-4 right-4 bg-darkSlate/90 backdrop-blur-2xl rounded-3xl px-4 py-3 flex flex-col gap-1 border border-stone-800/80 shadow-2xl z-10">
+            <div id="imagePreviewContainer" class="hidden flex items-center gap-2 mb-2 p-2 rounded-2xl border border-stone-800/80 bg-deepBlack/60 overflow-x-auto max-w-full scrollable-area"></div>
+            
+            <div class="flex items-end gap-2.5">
+                <input type="file" id="imageAttachmentInput" accept="image/*" multiple class="hidden">
+                
+                <button id="triggerUploadBtn" type="button" class="p-2 text-stone-500 hover:text-goldMain hover:bg-deepBlack/50 rounded-xl transition-all active:scale-90 shrink-0 mb-0.5 border border-transparent hover:border-stone-800" title="Anexar Imagens (máx 30)">
+                    <i data-lucide="paperclip" class="w-5 h-5"></i>
+                </button>
+                
+                <button id="quickAnalyzeBtn" type="button" class="p-2 text-stone-500 hover:text-goldMain hover:bg-deepBlack/50 rounded-xl transition-all active:scale-90 shrink-0 mb-0.5 border border-transparent hover:border-stone-800" title="Diagnóstico Rápido">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                </button>
+
+                <textarea id="unifiedInput" rows="1" placeholder="Consulte o Oráculo..." class="flex-1 text-sm bg-transparent text-stone-200 placeholder-stone-600 focus:outline-none py-1.5 resize-none max-h-36 overflow-y-auto leading-relaxed scrollable-area transition-all duration-200"></textarea>
+                
+                <button id="sendBtn" class="w-10 h-10 rounded-full bg-gradient-to-tr from-goldHover to-goldMain hover:brightness-110 flex items-center justify-center text-deepBlack transition-all duration-200 shrink-0 active:scale-90 shadow-md shadow-goldMain/10 mb-0.5">
+                    <i data-lucide="arrow-up-right" class="w-5 h-5 stroke-[3]"></i>
+                </button>
+            </div>
+            <div class="flex justify-between items-center px-1">
+                <span id="imageCounter" class="text-[8px] font-mono tracking-widest text-stone-600 uppercase">0/30 FOTOS</span>
+                <span id="charCounter" class="text-[8px] font-mono tracking-widest text-stone-600 uppercase">0 CHARS</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CONFIG MODAL -->
+    <div id="configModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden transition-all duration-300">
+        <div class="bg-darkSlate/95 border border-stone-800/80 rounded-3xl w-full max-w-md max-h-[85vh] p-5 flex flex-col gap-4 shadow-2xl overflow-y-auto scrollable-area modal-blur-enter">
+            
+            <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+                <h3 class="font-black text-xs tracking-widest uppercase text-goldMain flex items-center gap-2" id="configModalTitle">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-goldMain"></i>
+                    Modificadores do Sistema
+                </h3>
+                <div class="flex items-center gap-2">
+                    <button id="appResetBtn" class="p-2 hover:bg-red-950/40 text-stone-500 hover:text-accentRed rounded-xl transition-all" title="Resetar Aplicativo">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    </button>
+                    <button id="closeConfigBtn" class="p-2 hover:bg-stone-900 rounded-xl text-stone-500 hover:text-stone-200 transition-all">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-deepBlack/50 border border-stone-800/80 p-4 rounded-2xl flex flex-col gap-2 relative">
+                <label class="text-xs font-bold text-stone-300 uppercase tracking-widest flex items-center gap-1">
+                    <i data-lucide="palette" class="w-3.5 h-3.5 text-goldMain"></i> Tema e Layout da Interface
+                </label>
+                
+                <div id="customThemeSelector" class="w-full bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-xs text-stone-200 flex items-center justify-between cursor-pointer hover:border-goldMain/50 transition-all">
+                    <span id="selectedThemeLabel" class="font-bold flex items-center gap-2">
+                        <i data-lucide="sun" class="w-4 h-4 text-goldMain"></i> Clássico Dourado (Original)
+                    </span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-stone-500"></i>
+                </div>
+
+                <div id="themeDropdownBubble" class="hidden absolute left-4 right-4 top-[80px] bg-darkSlate border border-stone-800 rounded-2xl shadow-2xl p-2 z-50 flex flex-col gap-1 modal-blur-enter">
+                    <button type="button" onclick="selectThemeOption('classic')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-deepBlack text-xs font-bold text-stone-200 flex items-center justify-between transition-all">
+                        <span class="flex items-center gap-2"><i data-lucide="sun" class="w-4 h-4 text-goldMain"></i> Clássico Dourado</span>
+                        <i data-lucide="check" id="checkIconClassic" class="w-4 h-4 text-goldMain"></i>
+                    </button>
+                    <button type="button" onclick="selectThemeOption('emerald')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-deepBlack text-xs font-bold text-stone-200 flex items-center justify-between transition-all">
+                        <span class="flex items-center gap-2"><i data-lucide="gem" class="w-4 h-4 text-emerald-500"></i> Esmeralda / Kryptonita Cyber</span>
+                        <i data-lucide="check" id="checkIconEmerald" class="w-4 h-4 text-emerald-500 hidden"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-deepBlack/50 border border-stone-800/80 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-xs font-bold text-stone-300 uppercase tracking-widest flex items-center gap-1">
+                         Ativar Modo Psicólogo
+                    </label>
+                    <span class="text-[10px] text-stone-500 font-mono uppercase leading-normal">Ignora o personagem para mapear sua psique.</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input type="checkbox" id="psychoModeToggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-stone-900 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-stone-600 after:border-stone-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-deepBlack"></div>
+                </label>
+            </div>
+
+            <div class="bg-deepBlack/50 border border-stone-800/80 p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex flex-col gap-0.5">
+                    <label class="text-xs font-bold text-stone-300 uppercase tracking-widest flex items-center gap-1">
+                        Acoplar Filosofia de Conduta
+                    </label>
+                    <span class="text-[10px] text-stone-500 font-mono uppercase leading-normal">Mesclar matriz ideológica ao bot.</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input type="checkbox" id="includePhilosophyToggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-stone-900 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-stone-600 after:border-stone-500 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-goldMain peer-checked:after:bg-deepBlack"></div>
+                </label>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <i data-lucide="key-round" class="w-3.5 h-3.5 text-goldMain"></i>
+                    Chave de Acesso API (Gemini)
+                </label>
+                <input id="apiKeyInput" type="password" placeholder="Insira seu token..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-200 placeholder-stone-700 focus:outline-none focus:border-goldMain/50 transition-all font-mono">
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <i data-lucide="lock" class="w-3.5 h-3.5 text-goldMain"></i>
+                    Redefinir PIN (4 Dígitos)
+                </label>
+                <input id="changePasswordInput" type="password" maxlength="4" placeholder="Vazio para manter código atual" class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-200 placeholder-stone-700 focus:outline-none focus:border-goldMain/50 transition-all font-mono tracking-widest">
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <i data-lucide="user-cog" class="w-3.5 h-3.5 text-goldMain"></i>
+                    Identidade do Manipulador Ativo
+                </label>
+                <input id="personaCustomInput" type="text" placeholder="Ex: Ayanokoji, Makima, Machiavelli..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-200 placeholder-stone-700 focus:outline-none focus:border-goldMain/50 transition-all">
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <i data-lucide="user-cog" class="w-3.5 h-3.5 text-goldMain"></i>
+                    Perfil do Operador (Suas Variáveis)
+                </label>
+                <textarea id="userProfileInput" rows="3" placeholder="Adicione tudo sobre você mesmo..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-200 placeholder-stone-700 focus:outline-none focus:border-goldMain/50 transition-all resize-none leading-relaxed"></textarea>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <i data-lucide="gem" class="w-3.5 h-3.5 text-goldMain" id="customModIcon"></i>
+                    Modificação Comportamental Expressa
+                </label>
+                <textarea id="customModInput" rows="2" placeholder="Diga exatamente como quer que o bot se expresse..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-200 placeholder-stone-700 focus:outline-none focus:border-goldMain/50 transition-all resize-none leading-relaxed"></textarea>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-stone-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <i data-lucide="scroll" class="w-3.5 h-3.5 text-goldMain"></i>
+                    Manifesto Ideológico de Suporte
+                </label>
+                <textarea id="manifestoInput" rows="4" placeholder="Cole aqui seu próprio manifesto..." class="w-full text-xs bg-deepBlack border border-stone-800/80 rounded-xl p-3 text-stone-300 font-mono focus:outline-none focus:border-goldMain/50 transition-all resize-y leading-relaxed"></textarea>
+            </div>
+
+            <button id="saveConfigBtn" class="w-full bg-gradient-to-r from-goldHover to-goldMain hover:brightness-110 text-deepBlack font-black text-xs tracking-widest py-3.5 rounded-xl transition-all shadow-md mt-2 uppercase shrink-0 active:scale-95">
+                Salvar Matriz de Dados
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT MESSAGE -->
+    <div id="editMessageModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-55 flex items-center justify-center p-4 hidden">
+        <div class="bg-darkSlate border border-stone-800 rounded-2xl w-full max-w-sm p-5 flex flex-col gap-4 shadow-2xl modal-blur-enter">
+            <div class="flex flex-col gap-1">
+                <h4 class="text-xs font-black tracking-widest uppercase text-goldMain flex items-center gap-2">
+                    <i data-lucide="file-edit" class="w-4 h-4"></i>
+                    Ajustar Parâmetro de Entrada
+                </h4>
+            </div>
+            <textarea id="editMessageTextArea" rows="4" class="w-full text-xs bg-deepBlack border border-stone-800 rounded-xl p-3 text-stone-200 focus:outline-none focus:border-goldMain transition-all leading-relaxed resize-none"></textarea>
+            <div class="flex gap-3">
+                <button id="cancelEditMsgBtn" class="flex-1 bg-deepBlack border border-stone-800 hover:bg-stone-900 text-stone-400 font-bold text-xs py-3 rounded-xl transition-all uppercase tracking-wider active:scale-95">Interromper</button>
+                <button id="confirmEditMsgBtn" class="flex-1 bg-gradient-to-r from-goldHover to-goldMain text-deepBlack font-black text-xs py-3 rounded-xl transition-all shadow-md uppercase tracking-wider active:scale-95">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RESET -->
+    <div id="resetConfirmModal" class="fixed inset-0 bg-black/95 backdrop-blur-md z-55 flex items-center justify-center p-4 hidden">
+        <div class="bg-darkSlate border border-stone-800 rounded-2xl w-full max-w-xs p-5 flex flex-col gap-4 shadow-2xl text-center modal-blur-enter">
+            <div class="flex justify-center text-accentRed">
+                <i data-lucide="unplug" class="w-10 h-10"></i>
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <h4 class="text-xs font-black tracking-widest uppercase text-stone-200">Purga Total do Sistema</h4>
+                <p class="text-xs text-stone-500 leading-relaxed">Apagará irreversivelmente senhas, chaves API e históricos.</p>
+            </div>
+            <div class="flex gap-3 mt-1">
+                <button id="cancelResetBtn" class="flex-1 bg-deepBlack border border-stone-800 hover:bg-stone-900 text-stone-400 font-bold text-xs py-2.5 rounded-xl transition-all active:scale-95">Voltar</button>
+                <button id="confirmResetBtn" class="flex-1 bg-accentRed hover:bg-red-700 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-md active:scale-95">Purgar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL RENAME -->
+    <div id="renameModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-55 flex items-center justify-center p-4 hidden">
+        <div class="bg-darkSlate border border-stone-800 rounded-2xl w-full max-w-xs p-5 flex flex-col gap-4 shadow-2xl modal-blur-enter">
+            <div class="flex flex-col gap-1">
+                <h4 class="text-xs font-black tracking-widest uppercase text-goldMain flex items-center gap-2">
+                    <i data-lucide="tags" class="w-4 h-4"></i>
+                    Rotular Registro
+                </h4>
+            </div>
+            <input id="renameInput" type="text" class="w-full text-xs bg-deepBlack border border-stone-800 rounded-xl p-3 text-stone-200 focus:outline-none focus:border-goldMain transition-all">
+            <div class="flex gap-3">
+                <button id="cancelRenameBtn" class="flex-1 bg-deepBlack border border-stone-800 hover:bg-stone-900 text-stone-400 font-bold text-xs py-2.5 rounded-xl transition-all active:scale-95">Cancelar</button>
+                <button id="confirmRenameBtn" class="flex-1 bg-gradient-to-r from-goldHover to-goldMain text-deepBlack font-black text-xs py-2.5 rounded-xl transition-all shadow-md active:scale-95">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 bg-deepBlack/95 border border-stone-800/80 px-4 py-2.5 rounded-2xl text-xs text-goldMain shadow-2xl flex items-center gap-2 transition-all duration-300 opacity-0 scale-90 pointer-events-none z-50 backdrop-blur-md border-goldMain/20">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-goldMain"></i>
+        <span id="toastMsg">Matriz de dados atualizada</span>
+    </div>
+
+    <script>
+        function safeRenderIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        let setupStage = "normal";
+        let tempCreatedPin = "";
+        let currentPin = "";
+        let failedAttempts = 0;
+        let lockTimerInterval = null;
+        let timerClicks = 0;
+
+        let currentPersona = "Ayanokoji";
+        let userApiKey = "";
+        let customModification = "";
+        let activePhilosophy = "";
+        let userProfileData = "";
+        let includePhilosophy = false;
+        let psychoModeActive = false;
+        let selectedTheme = "classic";
+        
+        let conversations = {};
+        let currentChatId = "";
+        let targetRenameChatId = "";
+        let targetEditMessageIndex = null;
+        let userIsScrollingUp = false;
+        
+        let attachedImages = [];
+
+        let appSessionStartTime = Date.now();
+
+        function getSavedPin() {
+            return localStorage.getItem('app_secure_pin');
+        }
+
+        function determineSetupState() {
+            if (!getSavedPin()) {
+                setupStage = "create";
+                document.getElementById('loginTitle').innerText = "Gerar Novo Código";
+                document.getElementById('loginSubtitle').innerText = "DEFINA SEU PIN DE 4 DÍGITOS";
+            } else {
+                setupStage = "normal";
+                document.getElementById('loginTitle').innerText = "Núcleo Cognitivo";
+                document.getElementById('loginSubtitle').innerText = "AUTENTICAR ASSINATURA DIGITAL";
+            }
+        }
+
+        function updatePinDisplay() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (dot) {
+                    if (i < currentPin.length) {
+                        dot.className = selectedTheme === 'emerald'
+                            ? "w-4 h-4 rounded-full bg-gradient-to-tr from-emeraldHover to-emeraldAccent shadow-lg border border-emeraldLight scale-110 transition-all duration-200"
+                            : "w-4 h-4 rounded-full bg-gradient-to-tr from-goldHover to-goldMain shadow-lg border border-goldLight scale-110 transition-all duration-200";
+                    } else {
+                        dot.className = "w-4 h-4 rounded-full border border-stone-800 bg-transparent transition-all duration-200";
+                    }
+                }
+            }
+        }
+
+        function pressKey(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                updatePinDisplay();
+                if (currentPin.length === 4) {
+                    setTimeout(processPinAction, 250);
+                }
+            }
+        }
+
+        function backspaceKey() {
+            if (currentPin.length > 0) {
+                currentPin = currentPin.slice(0, -1);
+                updatePinDisplay();
+            }
+        }
+
+        function clearKeys() {
+            currentPin = "";
+            updatePinDisplay();
+        }
+
+        function processPinAction() {
+            if (setupStage === "create") {
+                tempCreatedPin = currentPin;
+                currentPin = "";
+                updatePinDisplay();
+                setupStage = "confirm";
+                document.getElementById('loginTitle').innerText = "Confirmar Código";
+                document.getElementById('loginSubtitle').innerText = "REPITA O PIN PARA REGISTRO";
+                showToast("Confirme o padrão numérico.");
+            } 
+            else if (setupStage === "confirm") {
+                if (currentPin === tempCreatedPin) {
+                    localStorage.setItem('app_secure_pin', currentPin);
+                    showToast("Assinatura estruturada com sucesso!");
+                    unlockAppScreen();
+                } else {
+                    currentPin = "";
+                    updatePinDisplay();
+                    setupStage = "create";
+                    document.getElementById('loginTitle').innerText = "Gerar Novo Código";
+                    showToast("Padrões divergentes. Reinicie.");
+                }
+            } 
+            else if (setupStage === "normal") {
+                if (currentPin === getSavedPin()) {
+                    failedAttempts = 0;
+                    localStorage.removeItem('failed_attempts');
+                    unlockAppScreen();
+                } else {
+                    failedAttempts++;
+                    localStorage.setItem('failed_attempts', failedAttempts);
+                    currentPin = "";
+                    updatePinDisplay();
+
+                    if (failedAttempts >= 2) {
+                        const unlockTime = Date.now() + (24 * 60 * 60 * 1000);
+                        localStorage.setItem('system_lockout_time', unlockTime);
+                        startLockout(unlockTime);
+                    } else {
+                        showToast("Código inválido. Resta uma tentativa.");
+                    }
+                }
+            }
+        }
+
+        function unlockAppScreen() {
+            const loginScreen = document.getElementById('loginScreen');
+            if (loginScreen) {
+                loginScreen.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                setTimeout(() => {
+                    loginScreen.style.display = 'none';
+                }, 400);
+            }
+        }
+
+        function startLockout(unlockTime) {
+            document.getElementById('keyboardContainer').classList.add('hidden');
+            document.getElementById('lockoutContainer').classList.remove('hidden');
+            document.getElementById('loginTitle').innerText = "SISTEMA SEQUESTRADO";
+
+            if (lockTimerInterval) clearInterval(lockTimerInterval);
+
+            function updateTimer() {
+                const timeLeft = unlockTime - Date.now();
+                if (timeLeft <= 0) {
+                    resetLockoutSystem();
+                } else {
+                    const hours = Math.floor(timeLeft / (1000 * 60 * 60)).toString().padStart(2, '0');
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000).toString().padStart(2, '0');
+                    document.getElementById('countdownTimer').innerText = `${hours}:${minutes}:${seconds}`;
+                }
+            }
+
+            updateTimer();
+            lockTimerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function handleTimerClick() {
+            timerClicks++;
+            if (timerClicks >= 7) {
+                resetLockoutSystem();
+                showToast("Bypass Executado.");
+            }
+        }
+
+        function resetLockoutSystem() {
+            if (lockTimerInterval) clearInterval(lockTimerInterval);
+            failedAttempts = 0;
+            timerClicks = 0;
+            currentPin = "";
+            localStorage.removeItem('system_lockout_time');
+            localStorage.removeItem('failed_attempts');
+
+            document.getElementById('lockoutContainer').classList.add('hidden');
+            document.getElementById('keyboardContainer').classList.remove('hidden');
+            determineSetupState();
+            updatePinDisplay();
+        }
+
+        function checkLockoutStatus() {
+            if (localStorage.getItem('failed_attempts')) {
+                failedAttempts = parseInt(localStorage.getItem('failed_attempts')) || 0;
+            }
+            const storedLockTime = localStorage.getItem('system_lockout_time');
+            if (storedLockTime) {
+                const unlockTime = parseInt(storedLockTime);
+                if (Date.now() < unlockTime) {
+                    startLockout(unlockTime);
+                } else {
+                    resetLockoutSystem();
+                }
+            }
+        }
+
+        const statsBtn = document.getElementById('statsBtn');
+        const statsDropdownMenu = document.getElementById('statsDropdownMenu');
+        const openConfigModalBtn = document.getElementById('openConfigModalBtn');
+        const configModal = document.getElementById('configModal');
+        const closeConfigBtn = document.getElementById('closeConfigBtn');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const changePasswordInput = document.getElementById('changePasswordInput');
+        const personaCustomInput = document.getElementById('personaCustomInput');
+        const userProfileInput = document.getElementById('userProfileInput');
+        const customModInput = document.getElementById('customModInput');
+        const manifestoInput = document.getElementById('manifestoInput');
+        const includePhilosophyToggle = document.getElementById('includePhilosophyToggle');
+        const psychoModeToggle = document.getElementById('psychoModeToggle'); 
+        
+        const customThemeSelector = document.getElementById('customThemeSelector');
+        const themeDropdownBubble = document.getElementById('themeDropdownBubble');
+        const selectedThemeLabel = document.getElementById('selectedThemeLabel');
+
+        const unifiedInput = document.getElementById('unifiedInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const chatHistory = document.getElementById('chatHistory');
+        const chatScrollContainer = document.getElementById('chatScrollContainer');
+        const geminiThinking = document.getElementById('geminiThinking');
+        const thinkingSender = document.getElementById('thinkingSender');
+        const memoryLimitWarning = document.getElementById('memoryLimitWarning');
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toastMsg');
+        const appResetBtn = document.getElementById('appResetBtn');
+        const charCounter = document.getElementById('charCounter');
+        const imageCounter = document.getElementById('imageCounter');
+        const quickTriggersContainer = document.getElementById('quickTriggersContainer');
+        
+        const resetConfirmModal = document.getElementById('resetConfirmModal');
+        const cancelResetBtn = document.getElementById('cancelResetBtn');
+        const confirmResetBtn = document.getElementById('confirmResetBtn');
+        const renameModal = document.getElementById('renameModal');
+        const renameInput = document.getElementById('renameInput');
+        const cancelRenameBtn = document.getElementById('cancelRenameBtn');
+        const confirmRenameBtn = document.getElementById('confirmRenameBtn');
+
+        const editMessageModal = document.getElementById('editMessageModal');
+        const editMessageTextArea = document.getElementById('editMessageTextArea');
+        const cancelEditMsgBtn = document.getElementById('cancelEditMsgBtn');
+        const confirmEditMsgBtn = document.getElementById('confirmEditMsgBtn');
+
+        const openSidebarBtn = document.getElementById('openSidebarBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const newChatBtn = document.getElementById('newChatBtn');
+        const chatListContainer = document.getElementById('chatListContainer');
+        const searchChatInput = document.getElementById('searchChatInput');
+
+        const imageAttachmentInput = document.getElementById('imageAttachmentInput');
+        const triggerUploadBtn = document.getElementById('triggerUploadBtn');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const quickAnalyzeBtn = document.getElementById('quickAnalyzeBtn');
+
+        const exportChatBtn = document.getElementById('exportChatBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        customThemeSelector.addEventListener('click', (e) => {
+            e.stopPropagation();
+            themeDropdownBubble.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!customThemeSelector.contains(e.target) && !themeDropdownBubble.contains(e.target)) {
+                themeDropdownBubble.classList.add('hidden');
+            }
+        });
+
+        function selectThemeOption(theme) {
+            selectedTheme = theme;
+            localStorage.setItem('app_theme', theme);
+            themeDropdownBubble.classList.add('hidden');
+            
+            const checkClassic = document.getElementById('checkIconClassic');
+            const checkEmerald = document.getElementById('checkIconEmerald');
+
+            if (theme === 'emerald') {
+                selectedThemeLabel.innerHTML = `<i data-lucide="gem" class="w-4 h-4 text-emerald-500"></i> Esmeralda / Kryptonita Cyber`;
+                checkClassic.classList.add('hidden');
+                checkEmerald.classList.remove('hidden');
+            } else {
+                selectedThemeLabel.innerHTML = `<i data-lucide="sun" class="w-4 h-4 text-goldMain"></i> Clássico Dourado (Original)`;
+                checkClassic.classList.remove('hidden');
+                checkEmerald.classList.add('hidden');
+            }
+            applyTheme(selectedTheme);
+            updatePinDisplay();
+            safeRenderIcons();
+        }
+
+        statsBtn.addEventListener('click', toggleStatsMenu);
+        openConfigModalBtn.addEventListener('click', () => {
+            toggleSidebar();
+            configModal.classList.remove('hidden');
+        });
+
+        function toggleStatsMenu(e) {
+            if(e) e.stopPropagation();
+            const isHidden = statsDropdownMenu.classList.contains('hidden');
+            if(isHidden) {
+                calculateStorageSize();
+                statsDropdownMenu.classList.remove('hidden');
+            } else {
+                statsDropdownMenu.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!statsBtn.contains(e.target) && !statsDropdownMenu.contains(e.target)) {
+                statsDropdownMenu.classList.add('hidden');
+            }
+        });
+
+        function updateAppTimer() {
+            const elapsed = Date.now() - appSessionStartTime;
+            const hours = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
+            const minutes = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
+            const seconds = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
+            document.getElementById('appTimeSpent').innerText = `${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateAppTimer, 1000);
+
+        function trackAccessLogs() {
+            const lastAccess = localStorage.getItem('app_last_access_time');
+            if(lastAccess) {
+                document.getElementById('appLastAccess').innerText = lastAccess;
+            } else {
+                document.getElementById('appLastAccess').innerText = "Primeiro Acesso";
+            }
+            
+            const now = new Date();
+            const formatted = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear().toString().slice(-2)} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            localStorage.setItem('app_last_access_time', formatted);
+        }
+
+        function calculateStorageSize() {
+            let totalBytes = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalBytes += (localStorage[key].length * 2);
+                }
+            }
+            const kb = (totalBytes / 1024).toFixed(2);
+            document.getElementById('appStorageSize').innerText = `${kb} KB`;
+        }
+
+        function updateLatencyStatusIndicator(state) {
+            const latencyDot = document.getElementById('latencyDot');
+            const latencyStatus = document.getElementById('latencyStatus');
+            
+            if(state === "green") {
+                latencyDot.className = "inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]";
+                latencyStatus.innerText = "Online // Pronto";
+            } else if(state === "yellow") {
+                latencyDot.className = "inline-block w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.8)] animate-pulse";
+                latencyStatus.innerText = "Computando...";
+            } else if(state === "red") {
+                latencyDot.className = "inline-block w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]";
+                if(!userApiKey) {
+                    latencyStatus.innerText = "Desconectado // Sem Chave";
+                } else {
+                    latencyStatus.innerText = "Terminal Instável";
+                }
+            }
+        }
+
+        openSidebarBtn.addEventListener('click', toggleSidebar);
+        closeSidebarBtn.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+        newChatBtn.addEventListener('click', () => { createNewChat(); toggleSidebar(); });
+
+        searchChatInput.addEventListener('input', () => {
+            renderChatList(searchChatInput.value.trim().toLowerCase());
+        });
+
+        exportChatBtn.addEventListener('click', () => {
+            const activeChat = conversations[currentChatId];
+            if (!activeChat || !activeChat.messages || activeChat.messages.length === 0) {
+                showToast("Sem mensagens para exportar.");
+                return;
+            }
+
+            let fileContent = `==================================================\n`;
+            fileContent += `SABEDORIA OCULTA - RELATÓRIO TÁTICO\n`;
+            fileContent += `REGISTRO: ${activeChat.title || "Sem Título"}\n`;
+            fileContent += `PERSONA: ${activeChat.persona || "Ayanokoji"}\n`;
+            fileContent += `DATA DA EXTRAÇÃO: ${new Date().toLocaleString()}\n`;
+            fileContent += `==================================================\n\n`;
+
+            activeChat.messages.forEach((msg, idx) => {
+                fileContent += `[${String(idx + 1).padStart(3, '0')}] ${msg.sender.toUpperCase()}:\n`;
+                fileContent += `${msg.text}\n\n`;
+                fileContent += `--------------------------------------------------\n`;
+            });
+
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `relatorio_${currentChatId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Relatório exportado em .txt");
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {
+                    showToast("Não foi possível ativar tela cheia.");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        quickAnalyzeBtn.addEventListener('click', () => {
+            injectTrigger("Realize uma análise tática relâmpago dividida em 3 colunas mentais: 1) Diagnóstico Oculto, 2) Riscos Ocultos, 3) Melhor Próximo Passo. Cenário: ");
+        });
+
+        appResetBtn.addEventListener('click', () => resetConfirmModal.classList.remove('hidden'));
+        cancelResetBtn.addEventListener('click', () => resetConfirmModal.classList.add('hidden'));
+        confirmResetBtn.addEventListener('click', () => {
+            localStorage.clear();
+            window.location.reload();
+        });
+
+        cancelRenameBtn.addEventListener('click', () => renameModal.classList.add('hidden'));
+        confirmRenameBtn.addEventListener('click', () => {
+            const finalTitle = renameInput.value.trim();
+            if (finalTitle !== "" && targetRenameChatId) {
+                conversations[targetRenameChatId].title = finalTitle;
+                saveConversations();
+                renderChatList();
+                renameModal.classList.add('hidden');
+                showToast("Nome do registro alterado.");
+            }
+        });
+
+        cancelEditMsgBtn.addEventListener('click', () => {
+            editMessageModal.classList.add('hidden');
+            targetEditMessageIndex = null;
+        });
+
+        confirmEditMsgBtn.addEventListener('click', () => {
+            const activeChat = conversations[currentChatId];
+            const updatedText = editMessageTextArea.value.trim();
+
+            if (updatedText !== "" && activeChat && targetEditMessageIndex !== null) {
+                activeChat.messages = activeChat.messages.slice(0, targetEditMessageIndex);
+                saveConversations();
+                
+                editMessageModal.classList.add('hidden');
+                targetEditMessageIndex = null;
+
+                unifiedInput.value = updatedText;
+                autoResizeInput();
+                sendBtn.click();
+            }
+        });
+
+        triggerUploadBtn.addEventListener('click', () => imageAttachmentInput.click());
+        imageAttachmentInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            if (attachedImages.length + files.length > 30) {
+                showToast("Limite excedido: máximo de 30 fotos.");
+                return;
+            }
+
+            let loadedCount = 0;
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    try {
+                        const base64Clean = evt.target.result.split(',')[1];
+                        attachedImages.push({
+                            base64: base64Clean,
+                            mimeType: file.type,
+                            previewSrc: evt.target.result
+                        });
+                    } catch(err) {
+                        console.error("Erro ao converter imagem", err);
+                    }
+                    loadedCount++;
+                    if (loadedCount === files.length) {
+                        renderImagePreviews();
+                        showToast(`${attachedImages.length} imagem(ns) acoplada(s).`);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+            imageAttachmentInput.value = "";
+        });
+
+        function renderImagePreviews() {
+            imagePreviewContainer.innerHTML = "";
+            if (attachedImages.length === 0) {
+                imagePreviewContainer.classList.add('hidden');
+            } else {
+                imagePreviewContainer.classList.remove('hidden');
+                attachedImages.forEach((imgObj, idx) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = "relative group shrink-0 animate-pop-in";
+                    
+                    const img = document.createElement('img');
+                    img.src = imgObj.previewSrc;
+                    img.className = "h-14 w-14 object-cover rounded-xl border border-stone-800 shadow-md";
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = "absolute -top-1.5 -right-1.5 bg-accentRed text-white rounded-full p-1 shadow-md hover:bg-red-700 transition-all active:scale-90";
+                    removeBtn.innerHTML = `<i data-lucide="x" class="w-3 h-3"></i>`;
+                    removeBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        removeAttachedImage(idx);
+                    };
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    imagePreviewContainer.appendChild(wrapper);
+                });
+            }
+            safeRenderIcons();
+            updateImageCounter();
+        }
+
+        function removeAttachedImage(index) {
+            attachedImages.splice(index, 1);
+            renderImagePreviews();
+            showToast("Imagem removida.");
+        }
+
+        function clearAttachedImage() {
+            attachedImages = [];
+            imageAttachmentInput.value = "";
+            renderImagePreviews();
+        }
+
+        function updateImageCounter() {
+            imageCounter.innerText = `${attachedImages.length}/30 FOTOS`;
+        }
+
+        function toggleSidebar() {
+            const isOpen = sidebarMenu.classList.contains('translate-x-0');
+            if (isOpen) {
+                sidebarMenu.classList.remove('translate-x-0');
+                sidebarMenu.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            } else {
+                sidebarMenu.classList.remove('-translate-x-full');
+                sidebarMenu.classList.add('translate-x-0');
+                sidebarOverlay.classList.remove('hidden');
+                renderChatList();
+            }
+        }
+
+        function runKryptoniteThreatScan() {
+            injectTrigger("⚡ [VARREDURA DE AMEAÇAS KRYPTONITA]: Execute um rastreamento instantâneo de riscos altos, vulnerabilidades veladas e alvos críticos no seguinte contexto: ");
+        }
+
+        function applyTheme(theme) {
+            selectedTheme = theme;
+            const body = document.getElementById('bodyContainer');
+            const headerLogoBox = document.getElementById('headerLogoBox');
+            const headerTitleText = document.getElementById('headerTitleText');
+            
+            const pinIconBox = document.getElementById('pinIconBox');
+            const pinGlow = document.getElementById('pinGlow');
+            const customModIcon = document.getElementById('customModIcon');
+
+            if (theme === 'emerald') {
+                body.classList.add('theme-emerald');
+                headerLogoBox.className = "bg-gradient-to-tr from-emerald-800 to-emerald-500 p-2 rounded-xl shadow-lg shadow-emerald-500/20";
+                headerLogoBox.innerHTML = `<i data-lucide="gem" class="w-5 h-5 text-emerald-950" id="headerLogoIcon"></i>`;
+                
+                headerTitleText.innerHTML = `KRYPTONITE OS <span class="text-[8px] text-emerald-950 bg-gradient-to-r from-emerald-300 to-emerald-500 px-2 py-0.5 rounded font-mono font-bold tracking-normal uppercase shadow-sm" id="headerBadge">CORE-X v3.0</span>`;
+                
+                if(pinIconBox) {
+                    pinIconBox.className = "relative bg-emeraldCard p-5 rounded-full shadow-2xl border border-emeraldAccent/40";
+                    pinIconBox.innerHTML = `<i data-lucide="gem" class="w-10 h-10 text-emeraldAccent animate-pulse-slow" id="pinIcon"></i>`;
+                }
+                if(pinGlow) pinGlow.className = "absolute -inset-1 bg-gradient-to-r from-emerald-500 to-emeraldHover rounded-full blur-md opacity-50 animate-pulse-slow";
+                if(customModIcon) customModIcon.setAttribute('data-lucide', 'gem');
+            } else {
+                body.classList.remove('theme-emerald');
+                headerLogoBox.className = "eye-icon-box-gold p-2 rounded-xl shadow-lg";
+                headerLogoBox.innerHTML = `<i data-lucide="eye" class="w-5 h-5 eye-icon-gold" id="headerLogoIcon"></i>`;
+                
+                headerTitleText.innerHTML = `Sabedoria Oculta <span class="text-[8px] text-deepBlack bg-gradient-to-r from-goldLight to-goldMain px-2 py-0.5 rounded font-mono font-bold tracking-normal uppercase shadow-sm" id="headerBadge">Arcane Engine</span>`;
+                
+                if(pinIconBox) {
+                    pinIconBox.className = "relative eye-icon-box-gold p-5 rounded-full shadow-2xl";
+                    pinIconBox.innerHTML = `<i data-lucide="eye" class="w-10 h-10 eye-icon-gold animate-pulse-slow" id="pinIcon"></i>`;
+                }
+                if(pinGlow) pinGlow.className = "absolute -inset-1 bg-gradient-to-r from-goldMain to-goldHover rounded-full blur-md opacity-40 animate-pulse-slow";
+                if(customModIcon) customModIcon.setAttribute('data-lucide', 'terminal');
+            }
+            safeRenderIcons();
+        }
+
+        function loadSettings() {
+            if (localStorage.getItem('app_theme')) {
+                selectedTheme = localStorage.getItem('app_theme');
+            }
+            applyTheme(selectedTheme);
+
+            if (localStorage.getItem('user_api_key')) {
+                userApiKey = localStorage.getItem('user_api_key');
+                apiKeyInput.value = userApiKey;
+                updateLatencyStatusIndicator("green");
+            } else {
+                updateLatencyStatusIndicator("red");
+            }
+            if (localStorage.getItem('current_persona')) {
+                currentPersona = localStorage.getItem('current_persona');
+                personaCustomInput.value = currentPersona;
+            } else {
+                currentPersona = "Ayanokoji";
+                personaCustomInput.value = "Ayanokoji";
+            }
+            if (localStorage.getItem('user_profile_data')) {
+                userProfileData = localStorage.getItem('user_profile_data');
+                userProfileInput.value = userProfileData;
+            }
+            if (localStorage.getItem('custom_modification')) {
+                customModification = localStorage.getItem('custom_modification');
+                customModInput.value = customModification;
+            }
+            if (localStorage.getItem('active_philosophy')) {
+                activePhilosophy = localStorage.getItem('active_philosophy');
+                manifestoInput.value = activePhilosophy;
+            }
+            if (localStorage.getItem('include_philosophy')) {
+                includePhilosophy = localStorage.getItem('include_philosophy') === 'true';
+                includePhilosophyToggle.checked = includePhilosophy;
+            }
+            if (localStorage.getItem('psycho_mode_active')) {
+                psychoModeActive = localStorage.getItem('psycho_mode_active') === 'true';
+                psychoModeToggle.checked = psychoModeActive;
+            }
+            if (localStorage.getItem('draft_unified')) {
+                unifiedInput.value = localStorage.getItem('draft_unified');
+                autoResizeInput();
+                updateCharCounter();
+            }
+
+            if (localStorage.getItem('saved_notebook_conversations')) {
+                try {
+                    conversations = JSON.parse(localStorage.getItem('saved_notebook_conversations'));
+                } catch(e) {
+                    conversations = {};
+                }
+            }
+            
+            selectThemeOption(selectedTheme);
+
+            if (localStorage.getItem('current_chat_id') && conversations[localStorage.getItem('current_chat_id')]) {
+                currentChatId = localStorage.getItem('current_chat_id');
+            } else {
+                createNewChat(false);
+            }
+
+            determineSetupState();
+            updatePersonaUI();
+            checkLockoutStatus();
+            loadChatMessagesIntoUI();
+            trackAccessLogs();
+        }
+
+        function createNewChat(switchImmediately = true) {
+            const id = "chat_" + Date.now();
+            conversations[id] = {
+                title: psychoModeActive ? "Análise Psicológica" : "Consulta Estrutural Nova",
+                messages: [],
+                persona: currentPersona,
+                includePhilosophy: includePhilosophy,
+                isPsychoChat: psychoModeActive
+            };
+            saveConversations();
+            if (switchImmediately) {
+                selectChat(id);
+            } else {
+                currentChatId = id;
+            }
+        }
+
+        function selectChat(id) {
+            currentChatId = id;
+            localStorage.setItem('current_chat_id', id);
+            currentPersona = conversations[id].persona || currentPersona;
+            personaCustomInput.value = currentPersona;
+            includePhilosophy = conversations[id].includePhilosophy !== undefined ? conversations[id].includePhilosophy : includePhilosophy;
+            includePhilosophyToggle.checked = includePhilosophy;
+            
+            psychoModeActive = conversations[id].isPsychoChat || false;
+            psychoModeToggle.checked = psychoModeActive;
+
+            updatePersonaUI();
+            loadChatMessagesIntoUI();
+        }
+
+        function renameChat(id, e) {
+            e.stopPropagation();
+            targetRenameChatId = id;
+            renameInput.value = conversations[id].title || "Consulta Estrutural Nova";
+            renameModal.classList.remove('hidden');
+        }
+
+        function deleteChat(id, e) {
+            e.stopPropagation();
+            delete conversations[id];
+            saveConversations();
+            if (currentChatId === id) {
+                const keys = Object.keys(conversations);
+                if (keys.length > 0) {
+                    selectChat(keys[keys.length - 1]);
+                } else {
+                    createNewChat(false);
+                    selectChat(currentChatId);
+                }
+            } else {
+                renderChatList();
+            }
+            showToast("Registro expurgado.");
+        }
+
+        function saveConversations() {
+            localStorage.setItem('saved_notebook_conversations', JSON.stringify(conversations));
+        }
+
+        chatScrollContainer.addEventListener('scroll', () => {
+            const maxScroll = chatScrollContainer.scrollHeight - chatScrollContainer.clientHeight;
+            if (maxScroll - chatScrollContainer.scrollTop > 120) {
+                userIsScrollingUp = true;
+            } else {
+                userIsScrollingUp = false;
+            }
+        });
+
+        function injectTrigger(text) {
+            unifiedInput.value = text;
+            unifiedInput.focus();
+            autoResizeInput();
+            updateCharCounter();
+        }
+
+        function autoResizeInput() {
+            unifiedInput.style.height = 'auto';
+            unifiedInput.style.height = Math.min(unifiedInput.scrollHeight, 144) + 'px';
+        }
+
+        function updateCharCounter() {
+            const length = unifiedInput.value.length;
+            charCounter.innerText = `${length} CHARS`;
+        }
+
+        psychoModeToggle.addEventListener('change', (e) => {
+            psychoModeActive = e.target.checked;
+            localStorage.setItem('psycho_mode_active', psychoModeActive);
+            
+            if(conversations[currentChatId]) {
+                conversations[currentChatId].isPsychoChat = psychoModeActive;
+                saveConversations();
+            }
+            
+            updatePersonaUI();
+            
+            const wSender = document.getElementById('welcomeSender');
+            const wText = document.getElementById('welcomeText');
+            const wFooter = document.getElementById('welcomeFooter');
+            
+            if (psychoModeActive) {
+                if(wSender) wSender.innerText = "Analista Psíquico";
+                if(wText) wText.innerText = "\"Modo de autoanálise comportamental ativado. Sem julgamentos ou barreiras morais, meu único objetivo é mapear seus padrões, mecanismos de defesa e funcionamento cognitivo para fazer você se entender melhor. O que vamos destrinchar hoje?\"";
+                if(wFooter) wFooter.innerText = "Escopo: Mapeamento de Psique e Padrões";
+            } else {
+                if(wSender) wSender.innerText = currentPersona;
+                if(wText) wText.innerText = `"${currentPersona} ativo e pareado ao terminal. Apresente os vetores do cenário. Processarei a lógica operacional sem atenuantes morais."`;
+                if(wFooter) wFooter.innerText = includePhilosophy ? "Escopo: Prático + Doutrinário" : "Escopo: Prática Analítica Pura";
+            }
+            
+            showToast(psychoModeActive ? "Modo Analista Psicológico Ativado" : "Modo Operação Tática Ativado");
+        });
+
+        function loadChatMessagesIntoUI() {
+            chatHistory.innerHTML = "";
+            
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.id = "welcomeMessage";
+            welcomeDiv.className = "flex flex-col gap-2 max-w-[92%] self-start bg-darkSlate/90 border border-stone-800/80 p-4 rounded-2xl rounded-tl-none shadow-xl backdrop-blur-md animate-fade-in-up";
+            
+            const welcomeHeader = document.createElement('div');
+            welcomeHeader.className = "flex items-center justify-between border-b border-stone-800/60 pb-2";
+            
+            const welcomeSender = document.createElement('span');
+            welcomeSender.id = "welcomeSender";
+            welcomeSender.className = "text-[10px] text-goldMain font-extrabold uppercase tracking-widest flex items-center gap-1.5";
+            welcomeSender.innerHTML = `<i data-lucide="shield" class="w-3 h-3"></i> ${psychoModeActive ? "Analista Psíquico" : currentPersona}`;
+            
+            const welcomeVer = document.createElement('span');
+            welcomeVer.className = "text-[8px] text-stone-600 font-mono";
+            welcomeVer.innerText = "v2.6.0-AR";
+            
+            welcomeHeader.appendChild(welcomeSender);
+            welcomeHeader.appendChild(welcomeVer);
+            
+            const welcomeText = document.createElement('p');
+            welcomeText.id = "welcomeText";
+            welcomeText.className = "text-xs text-stone-300 leading-relaxed font-normal";
+            welcomeText.innerText = psychoModeActive 
+                ? "\"Modo de autoanálise comportamental ativado. Sem julgamentos ou barreiras morais, meu único objetivo é mapear seus padrões, mecanismos de defesa e funcionamento cognitivo para fazer você se entender melhor. O que vamos destrinchar hoje?\""
+                : `"${currentPersona} ativo e pareado ao terminal. Apresente os vetores do cenário. Processarei a lógica operacional sem atenuantes morais."`;
+                
+            const welcomeFooterDiv = document.createElement('div');
+            welcomeFooterDiv.className = "flex items-center justify-between mt-1 pt-2 border-t border-stone-800/40";
+            
+            const welcomeFooterText = document.createElement('span');
+            welcomeFooterText.id = "welcomeFooter";
+            welcomeFooterText.className = "text-[8px] text-stone-500 font-mono uppercase tracking-widest";
+            welcomeFooterText.innerText = psychoModeActive ? "Escopo: Mapeamento de Psique e Padrões" : (includePhilosophy ? "Escopo: Prático + Doutrinário" : "Escopo: Prática Analítica Pura");
+            
+            const welcomeDot = document.createElement('span');
+            welcomeDot.className = "inline-flex w-1.5 h-1.5 rounded-full bg-goldMain/60 animate-pulse";
+            
+            welcomeFooterDiv.appendChild(welcomeFooterText);
+            welcomeFooterDiv.appendChild(welcomeDot);
+            
+            welcomeDiv.appendChild(welcomeHeader);
+            welcomeDiv.appendChild(welcomeText);
+            welcomeDiv.appendChild(welcomeFooterDiv);
+            
+            chatHistory.appendChild(welcomeDiv);
+
+            const activeChat = conversations[currentChatId];
+            if (activeChat && activeChat.messages) {
+                if (activeChat.messages.length >= 200) {
+                    activeChat.messages = activeChat.messages.slice(10);
+                    saveConversations();
+                    memoryLimitWarning.classList.remove('hidden');
+                    setTimeout(() => memoryLimitWarning.classList.add('hidden'), 5000);
+                }
+
+                if (activeChat.messages.length > 0) {
+                    quickTriggersContainer.classList.add('hidden');
+                } else {
+                    quickTriggersContainer.classList.remove('hidden');
+                }
+
+                activeChat.messages.forEach((msg, idx) => {
+                    appendMessageUI(msg.sender, msg.text, msg.isUser, idx, msg.imagesSrc);
+                });
+            } else {
+                quickTriggersContainer.classList.remove('hidden');
+            }
+
+            safeRenderIcons();
+            chatScrollContainer.scrollTop = chatScrollContainer.scrollHeight;
+        }
+
+        function renderChatList(filterTerm = "") {
+            chatListContainer.innerHTML = "";
+            const keys = Object.keys(conversations).reverse();
+
+            keys.forEach(id => {
+                const chat = conversations[id];
+                const titleText = chat.title || "Linha Cognitiva";
+
+                if(filterTerm && !titleText.toLowerCase().includes(filterTerm)) {
+                    return;
+                }
+
+                const activeClass = (id === currentChatId) 
+                    ? "bg-darkSlate text-goldMain border-l-4 border-goldMain shadow-md gold-glow-sm" 
+                    : "hover:bg-darkSlate/50 text-stone-400 hover:text-stone-200 border-l-2 border-stone-800/80";
+                
+                const item = document.createElement('div');
+                item.className = `group flex items-center justify-between p-3.5 rounded-xl text-xs font-medium tracking-wider cursor-pointer transition-all duration-200 ${activeClass} border border-stone-800/40`;
+
+                item.onclick = () => { selectChat(id); toggleSidebar(); };
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = "truncate pr-2 flex-1 font-medium text-[11px]";
+                titleSpan.innerText = titleText;
+
+                const btnContainer = document.createElement('div');
+                btnContainer.className = "flex items-center gap-1 shrink-0 opacity-80 group-hover:opacity-100";
+
+                const editBtn = document.createElement('button');
+                editBtn.className = "text-stone-500 hover:text-goldMain p-1 rounded-lg transition-all hover:bg-stone-900";
+                editBtn.innerHTML = `<i data-lucide="edit-2" class="w-3.5 h-3.5"></i>`;
+                editBtn.onclick = (e) => renameChat(id, e);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = "text-stone-500 hover:text-accentRed p-1 rounded-lg transition-all hover:bg-stone-900";
+                deleteBtn.innerHTML = `<i data-lucide="trash-2" class="w-3.5 h-3.5"></i>`;
+                deleteBtn.onclick = (e) => deleteChat(id, e);
+
+                btnContainer.appendChild(editBtn);
+                btnContainer.appendChild(deleteBtn);
+                item.appendChild(titleSpan);
+                item.appendChild(btnContainer);
+                chatListContainer.appendChild(item);
+            });
+            safeRenderIcons();
+        }
+
+        unifiedInput.addEventListener('input', () => { 
+            localStorage.setItem('draft_unified', unifiedInput.value); 
+            autoResizeInput();
+            updateCharCounter();
+        });
+
+        function updatePersonaUI() {
+            if (psychoModeActive) {
+                unifiedInput.placeholder = "Explore sua psicologia...";
+                thinkingSender.innerText = "Analista Psíquico";
+            } else {
+                unifiedInput.placeholder = `Consulte o ${currentPersona}...`;
+                thinkingSender.innerText = currentPersona;
+            }
+            safeRenderIcons();
+        }
+
+        closeConfigBtn.addEventListener('click', () => configModal.classList.add('hidden'));
+
+        saveConfigBtn.addEventListener('click', () => {
+            userApiKey = apiKeyInput.value.trim();
+            customModification = customModInput.value.trim();
+            activePhilosophy = manifestoInput.value.trim();
+            currentPersona = personaCustomInput.value.trim() || "Ayanokoji";
+            userProfileData = userProfileInput.value.trim();
+            includePhilosophy = includePhilosophyToggle.checked;
+
+            const newPin = changePasswordInput.value.trim();
+            if(newPin) {
+                if(newPin.length === 4 && !isNaN(newPin)) {
+                    localStorage.setItem('app_secure_pin', newPin);
+                    changePasswordInput.value = "";
+                } else {
+                    showToast("O PIN deve ter 4 números.");
+                    return;
+                }
+            }
+
+            localStorage.setItem('user_api_key', userApiKey);
+            localStorage.setItem('custom_modification', customModification);
+            localStorage.setItem('active_philosophy', activePhilosophy);
+            localStorage.setItem('current_persona', currentPersona);
+            localStorage.setItem('user_profile_data', userProfileData);
+            localStorage.setItem('include_philosophy', includePhilosophy);
+            localStorage.setItem('app_theme', selectedTheme);
+
+            applyTheme(selectedTheme);
+
+            if(conversations[currentChatId]) {
+                conversations[currentChatId].persona = currentPersona;
+                conversations[currentChatId].includePhilosophy = includePhilosophy;
+                saveConversations();
+            }
+
+            updatePersonaUI();
+            configModal.classList.add('hidden');
+            showToast("Matriz comportamental salva.");
+            if(userApiKey) {
+                updateLatencyStatusIndicator("green");
+            } else {
+                updateLatencyStatusIndicator("red");
+            }
+        });
+
+        function showToast(msg) {
+            toastMsg.innerText = msg;
+            toast.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'scale-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'scale-100');
+                toast.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+            }, 2500);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Dados copiados.");
+            }).catch(() => {
+                showToast("Falha ao copiar.");
+            });
+        }
+
+        function editUserMessage(index) {
+            const activeChat = conversations[currentChatId];
+            if (!activeChat || !activeChat.messages[index]) return;
+
+            targetEditMessageIndex = index;
+            editMessageTextArea.value = activeChat.messages[index].text;
+            
+            editMessageModal.classList.remove('hidden');
+            editMessageTextArea.focus();
+        }
+
+        function appendMessageUI(sender, text, isUser, index = null, imagesSrcArray = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isUser 
+                ? "msg-user-box flex flex-col gap-2 max-w-[92%] self-end bg-goldMain/10 border border-goldMain/30 p-4 rounded-2xl rounded-tr-none text-right relative group shadow-lg backdrop-blur-md shrink-0 select-text animate-fade-in-up"
+                : "msg-ai-box flex flex-col gap-2 max-w-[92%] self-start bg-darkSlate/90 border border-stone-800 p-4 rounded-2xl rounded-tl-none relative group shadow-lg backdrop-blur-md shrink-0 select-text animate-fade-in-up";
+
+            const senderSpan = document.createElement('span');
+            senderSpan.className = isUser ? "text-[10px] text-stone-400 font-extrabold uppercase tracking-widest" : "text-[10px] text-goldMain font-extrabold uppercase tracking-widest";
+            
+            let msgNumber = (index !== null) ? String(index + 1).padStart(3, '0') : "---";
+            senderSpan.innerText = `[#${msgNumber}] ${sender}`;
+            msgDiv.appendChild(senderSpan);
+
+            if (imagesSrcArray && Array.isArray(imagesSrcArray) && imagesSrcArray.length > 0) {
+                const imgGrid = document.createElement('div');
+                imgGrid.className = "flex flex-wrap gap-2 my-1.5 self-start";
+                imagesSrcArray.forEach(src => {
+                    if (src) {
+                        const attachedImg = document.createElement('img');
+                        attachedImg.src = src;
+                        attachedImg.className = "max-w-[120px] max-h-32 object-cover rounded-xl border border-stone-800 shadow-inner";
+                        imgGrid.appendChild(attachedImg);
+                    }
+                });
+                msgDiv.appendChild(imgGrid);
+            }
+
+            const textP = document.createElement('div');
+            textP.className = isUser 
+                ? "text-xs text-stone-200 leading-relaxed whitespace-pre-line text-left break-words pb-3 font-normal"
+                : "ai-formatted-text text-left break-words pb-3";
+
+            if (!isUser && typeof marked !== 'undefined') {
+                textP.innerHTML = marked.parse(text || "");
+            } else {
+                textP.innerText = text || "";
+            }
+
+            msgDiv.appendChild(textP);
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = "absolute bottom-1.5 right-2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-deepBlack/90 backdrop-blur-sm px-2 py-1 rounded-lg border border-stone-800 shadow-md";
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = "text-stone-400 hover:text-goldMain transition-colors p-0.5 active:scale-90";
+            copyBtn.innerHTML = `<i data-lucide="clipboard" class="w-3.5 h-3.5"></i>`;
+            copyBtn.onclick = (e) => { e.stopPropagation(); copyToClipboard(text); };
+            actionsDiv.appendChild(copyBtn);
+
+            if (isUser && index !== null) {
+                const editBtn = document.createElement('button');
+                editBtn.className = "text-stone-400 hover:text-goldMain transition-colors p-0.5 active:scale-90";
+                editBtn.innerHTML = `<i data-lucide="sliders" class="w-3.5 h-3.5"></i>`;
+                editBtn.onclick = (e) => { e.stopPropagation(); editUserMessage(index); };
+                actionsDiv.appendChild(editBtn);
+            }
+
+            msgDiv.appendChild(actionsDiv);
+            chatHistory.appendChild(msgDiv);
+            safeRenderIcons();
+            
+            if (!userIsScrollingUp) {
+                chatScrollContainer.scrollTo({
+                    top: chatScrollContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function appendMessage(sender, text, isUser, imagesSrcArray = null) {
+            if(conversations[currentChatId]) {
+                conversations[currentChatId].messages.push({ sender, text, isUser, imagesSrc: imagesSrcArray });
+                
+                if(isUser && (conversations[currentChatId].title === "Consulta Estrutural Nova" || conversations[currentChatId].title === "Análise Psicológica")) {
+                    const cleanTitle = (text || "Anexo Enviado").substring(0, 25).toUpperCase() + "...";
+                    conversations[currentChatId].title = cleanTitle;
+                }
+                saveConversations();
+            }
+            const currentIdx = conversations[currentChatId].messages.length - 1;
+            appendMessageUI(sender, text, isUser, currentIdx, imagesSrcArray);
+        }
+
+        sendBtn.addEventListener('click', async () => {
+            try {
+                const promptContent = unifiedInput.value.trim();
+
+                if (!promptContent && attachedImages.length === 0) return;
+
+                if (!userApiKey) {
+                    showToast("Insira a Chave de API no Painel Geral.");
+                    updateLatencyStatusIndicator("red");
+                    configModal.classList.remove('hidden');
+                    return;
+                }
+
+                sendBtn.disabled = true;
+                quickTriggersContainer.classList.add('hidden'); 
+
+                const snapshotImagesSrc = attachedImages.length > 0 ? attachedImages.map(img => img.previewSrc) : null;
+                const currentAttachedImages = [...attachedImages];
+
+                const historyBeforeCurrent = conversations[currentChatId]?.messages ? [...conversations[currentChatId].messages] : [];
+
+                appendMessage("Você", promptContent, true, snapshotImagesSrc);
+
+                unifiedInput.value = "";
+                localStorage.setItem('draft_unified', "");
+                autoResizeInput();
+                updateCharCounter();
+
+                chatHistory.appendChild(geminiThinking);
+                geminiThinking.classList.remove('hidden');
+
+                if (!userIsScrollingUp) {
+                    chatScrollContainer.scrollTo({
+                        top: chatScrollContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+
+                let systemInstruction = "";
+
+                if (psychoModeActive) {
+                    systemInstruction = `
+                    Você é um Analista de Psicologia Comportamental. Mapeie padrões cognitivos e psicológicos do operador.
+                    DADOS DO OPERADOR: ${userProfileData || "Nenhum fornecido."}
+                    Formate as respostas com visual bonito, parágrafos limpos, tópicos estruturados e sem símbolos markdown brutos.
+                    `;
+                } else {
+                    const scopeInstruction = includePhilosophy 
+                        ? "Você deve fundir os conhecimentos práticos e a FILOSOFIA moral do personagem para responder."
+                        : "Foque em EXTRAIR APENAS AS HABILIDADES ANALÍTICAS e estratégias puras dele.";
+
+                    systemInstruction = `
+                    Você assumirá o intelecto e perícia do personagem: ${currentPersona}.
+                    DADOS DO OPERADOR: ${userProfileData || "Nenhum."}
+                    Filosofia: ${activePhilosophy || "Nenhuma."}
+                    Modificação de Comportamento: ${customModification || "Estratégico e conciso."}
+                    ${scopeInstruction}
+                    Formate as respostas organizadas, com listas limpas e leitura confortável.
+                    `;
+                }
+
+                const structuralContents = [];
+                const slicedHistory = historyBeforeCurrent.slice(-18);
+                
+                slicedHistory.forEach(msg => {
+                    if(msg.text && msg.text.trim() !== "") {
+                        structuralContents.push({
+                            role: msg.isUser ? "user" : "model",
+                            parts: [{ text: msg.text }]
+                        });
+                    }
+                });
+
+                const currentParts = [];
+                if (currentAttachedImages && currentAttachedImages.length > 0) {
+                    currentAttachedImages.forEach(img => {
+                        if (img && img.base64 && img.mimeType) {
+                            currentParts.push({
+                                inlineData: {
+                                    mimeType: img.mimeType,
+                                    data: img.base64
+                                }
+                            });
+                        }
+                    });
+                }
+
+                currentParts.push({ text: promptContent || "Analise a imagem acoplada." });
+
+                structuralContents.push({
+                    role: "user",
+                    parts: currentParts
+                });
+
+                clearAttachedImage();
+
+                const startTime = Date.now();
+                updateLatencyStatusIndicator("yellow");
+
+                const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
+                
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemInstruction }] },
+                        contents: structuralContents,
+                        safetySettings: [
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || "Erro na resposta da API.");
+                }
+
+                const result = await response.json();
+                const textResult = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                geminiThinking.classList.add('hidden');
+                
+                const duration = Date.now() - startTime;
+                document.getElementById('latencyStatus').innerText = `Online // Latência: ${duration}ms`;
+                updateLatencyStatusIndicator("green");
+
+                if (textResult) {
+                    const responderName = psychoModeActive ? "Analista Psíquico" : currentPersona;
+                    appendMessage(responderName, textResult, false);
+                } else {
+                    appendMessage("Erro de Processamento", "A API não retornou texto válido.", false);
+                }
+
+            } catch (err) {
+                console.error("Erro no envio:", err);
+                geminiThinking.classList.add('hidden');
+                updateLatencyStatusIndicator("red");
+                showToast("Erro: " + (err.message || "Falha ao enviar mensagem."));
+                appendMessage("Falha de Conexão", `Não foi possível processar: ${err.message}`, false);
+            } finally {
+                sendBtn.disabled = false;
+            }
+        });
+
+        unifiedInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey && !sendBtn.disabled) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            safeRenderIcons();
+        });
+    </script>
+</body>
+</html>
